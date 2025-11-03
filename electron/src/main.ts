@@ -114,6 +114,15 @@ class BattleconnectElectron {
         electron: process.versions.electron,
       };
     });
+
+    // Input forwarding for game sharing
+    ipcMain.on('send-keyboard-input', (_, keyEvent) => {
+      this.forwardKeyboardInput(keyEvent);
+    });
+
+    ipcMain.on('send-mouse-input', (_, mouseEvent) => {
+      this.forwardMouseInput(mouseEvent);
+    });
   }
 
   private startGameDetection(): void {
@@ -147,6 +156,87 @@ class BattleconnectElectron {
       console.error('Failed to launch game platform:', error);
       return false;
     }
+  }
+
+  private forwardKeyboardInput(keyEvent: any): void {
+    // This is a complex feature that would require native OS integration
+    // For Windows, this would use Windows API calls
+    // For macOS, this would use Core Graphics or other native APIs
+    // For Linux, this would use X11 or other display server APIs
+    
+    console.log('Forwarding keyboard input:', keyEvent);
+    
+    // Implementation would depend on the platform
+    if (process.platform === 'win32') {
+      // Use Windows API to send input to the Battlefront II window
+      // This would require additional native modules or libraries
+      this.sendWindowsKeyInput(keyEvent);
+    } else if (process.platform === 'darwin') {
+      // Use macOS APIs for input forwarding
+      this.sendMacOSKeyInput(keyEvent);
+    } else if (process.platform === 'linux') {
+      // Use Linux X11 or Wayland for input forwarding
+      this.sendLinuxKeyInput(keyEvent);
+    }
+  }
+
+  private forwardMouseInput(mouseEvent: any): void {
+    console.log('Forwarding mouse input:', mouseEvent);
+    
+    if (process.platform === 'win32') {
+      this.sendWindowsMouseInput(mouseEvent);
+    } else if (process.platform === 'darwin') {
+      this.sendMacOSMouseInput(mouseEvent);
+    } else if (process.platform === 'linux') {
+      this.sendLinuxMouseInput(mouseEvent);
+    }
+  }
+
+  // Platform-specific input forwarding implementations
+  private sendWindowsKeyInput(keyEvent: any): void {
+    // This would require native Windows API integration
+    // For demonstration, we're logging what would be implemented
+    console.log('Windows key input forwarding (requires native implementation):', keyEvent);
+    
+    // Example of what this would involve:
+    // - Find the Battlefront II window handle
+    // - Use SendMessage or PostMessage to send WM_KEYDOWN/WM_KEYUP messages
+    // - Handle special keys, modifiers, and key combinations
+  }
+
+  private sendWindowsMouseInput(mouseEvent: any): void {
+    console.log('Windows mouse input forwarding (requires native implementation):', mouseEvent);
+    
+    // Example implementation:
+    // - Convert screen coordinates to window coordinates
+    // - Send WM_MOUSEMOVE, WM_LBUTTONDOWN, WM_LBUTTONUP, etc.
+    // - Handle different mouse buttons and wheel events
+  }
+
+  private sendMacOSKeyInput(keyEvent: any): void {
+    console.log('macOS key input forwarding (requires native implementation):', keyEvent);
+    
+    // Would use Core Graphics or other macOS frameworks
+    // CGEventCreateKeyboardEvent, CGEventPost, etc.
+  }
+
+  private sendMacOSMouseInput(mouseEvent: any): void {
+    console.log('macOS mouse input forwarding (requires native implementation):', mouseEvent);
+    
+    // Would use CGEventCreateMouseEvent, CGEventPost, etc.
+  }
+
+  private sendLinuxKeyInput(keyEvent: any): void {
+    console.log('Linux key input forwarding (requires native implementation):', keyEvent);
+    
+    // Would use X11 XTest extension or similar
+    // XTestFakeKeyEvent, XTestFakeButtonEvent, etc.
+  }
+
+  private sendLinuxMouseInput(mouseEvent: any): void {
+    console.log('Linux mouse input forwarding (requires native implementation):', mouseEvent);
+    
+    // Would use X11 XTest extension for mouse simulation
   }
 }
 

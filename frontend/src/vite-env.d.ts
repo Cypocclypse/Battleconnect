@@ -28,6 +28,10 @@ declare global {
       launchGamePlatform: (platform: string) => Promise<boolean>;
       getSystemInfo: () => Promise<any>;
       
+      // Input forwarding for game sharing
+      sendKeyboardInput: (keyEvent: any) => void;
+      sendMouseInput: (mouseEvent: any) => void;
+      
       // Utility
       removeAllListeners: (channel: string) => void;
     };

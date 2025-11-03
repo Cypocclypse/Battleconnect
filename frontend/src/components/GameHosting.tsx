@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useWebSocket } from '../hooks/useWebSocket';
-import { ScreenStreaming } from './ScreenStreaming';
+import { GameInstanceSharing } from '../services/GameInstanceSharing';
 
 interface Player {
   id: string;
@@ -37,9 +37,15 @@ export const GameHosting: React.FC<GameHostingProps> = ({
   const [currentGuest, setCurrentGuest] = useState<Player | null>(null);
   const [hostingStatus, setHostingStatus] = useState<'idle' | 'hosting' | 'guest'>('idle');
   const [sessionId, setSessionId] = useState<string | undefined>();
+  const gameInstanceSharingRef = useRef<GameInstanceSharing | null>(null);
 
   useEffect(() => {
     if (!socket) return;
+
+    // Initialize game instance sharing service
+    if (!gameInstanceSharingRef.current) {
+      gameInstanceSharingRef.current = new GameInstanceSharing(socket);
+    }
 
     // Listen for available hosts
     socket.on('hosts-updated', (hosts: Player[]) => {

@@ -22,6 +22,10 @@ contextBridge.exposeInMainWorld('electronAPI', {
   launchGamePlatform: (platform: string) => ipcRenderer.invoke('launch-game-platform', platform),
   getSystemInfo: () => ipcRenderer.invoke('get-system-info'),
 
+  // Input forwarding for game sharing
+  sendKeyboardInput: (keyEvent: any) => ipcRenderer.send('send-keyboard-input', keyEvent),
+  sendMouseInput: (mouseEvent: any) => ipcRenderer.send('send-mouse-input', mouseEvent),
+
   // Utility
   removeAllListeners: (channel: string) => ipcRenderer.removeAllListeners(channel),
 });

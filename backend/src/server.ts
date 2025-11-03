@@ -366,6 +366,51 @@ io.on('connection', (socket) => {
     console.log(`Lobby hosting request: ${requesterName} wants to join lobby ${lobbyId}`);
   });
 
+  // Game Instance Sharing events
+  socket.on('request-game-sharing', (data) => {
+    const { hostId, guestId } = data;
+    socket.to(hostId).emit('game-sharing-request', {
+      guestId,
+      guestName: socket.id // Would be better to use actual player name
+    });
+  });
+
+  socket.on('game-sharing-accepted', (data) => {
+    const { guestId, sessionId } = data;
+    socket.to(guestId).emit('game-sharing-accepted', { sessionId });
+  });
+
+  socket.on('game-sharing-rejected', (data) => {
+    const { guestId, reason } = data;
+    socket.to(guestId).emit('game-sharing-rejected', { reason });
+  });
+
+  socket.on('remote-desktop-offer', (data) => {
+    const { guestId, offer, sessionId } = data;
+    socket.to(guestId).emit('remote-desktop-offer', { offer, sessionId });
+  });
+
+  socket.on('remote-desktop-answer', (data) => {
+    const { hostId, answer, sessionId } = data;
+    socket.to(hostId).emit('remote-desktop-answer', { answer, sessionId });
+  });
+
+  socket.on('ice-candidate', (data) => {
+    const { candidate, sessionId } = data;
+    // Forward ICE candidate to the other peer
+    socket.broadcast.emit('ice-candidate', { candidate, sessionId });
+  });
+
+  socket.on('guest-input', (data) => {
+    const { hostId, input } = data;
+    socket.to(hostId).emit('guest-input', { input });
+  });
+
+  socket.on('end-game-sharing', (data) => {
+    const { sessionId } = data;
+    socket.broadcast.emit('session-ended', { sessionId });
+  });
+
   // Disconnect handling
   socket.on('disconnect', () => {
     console.log(`User disconnected: ${socket.id}`);

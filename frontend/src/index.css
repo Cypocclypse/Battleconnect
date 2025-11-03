@@ -1,0 +1,46 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html,
+  body,
+  #root {
+    height: 100vh;
+    overflow: hidden;
+  }
+
+  * {
+    box-sizing: border-box;
+  }
+}
+
+@layer components {
+  .btn-primary {
+    @apply bg-rebel-600 hover:bg-rebel-700 text-white font-semibold py-2 px-4 rounded transition-colors duration-200;
+  }
+
+  .btn-secondary {
+    @apply bg-imperial-600 hover:bg-imperial-500 text-white font-semibold py-2 px-4 rounded transition-colors duration-200;
+  }
+
+  .btn-danger {
+    @apply bg-red-600 hover:bg-red-700 text-white font-semibold py-2 px-4 rounded transition-colors duration-200;
+  }
+
+  .input-field {
+    @apply bg-imperial-800 border border-imperial-600 text-white px-3 py-2 rounded focus:outline-none focus:border-rebel-500 transition-colors duration-200;
+  }
+
+  .panel {
+    @apply bg-imperial-800 border border-imperial-600 rounded-lg shadow-lg;
+  }
+
+  .panel-header {
+    @apply bg-imperial-700 px-4 py-3 border-b border-imperial-600 font-orbitron font-bold text-lg;
+  }
+
+  .panel-content {
+    @apply p-4;
+  }
+}

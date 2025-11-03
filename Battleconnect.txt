@@ -1,0 +1,139 @@
+# Battleconnect
+
+Battleconnect is a full-screen multiplayer shell for **Star Wars Battlefront II (2017)** that enables players on PC or via PS Remote Play to coordinate and play synchronized matches together — without mods, code injection, or game file modification. It runs entirely inside a browser or optional Electron shell, and is deployable directly from GitHub to **Render** for instant access via a public link.
+
+---
+
+## 🚀 Features
+
+- Real Battlefront II gameplay — players launch their own local copy of the game
+- Live desktop view (Electron only) — launch EA App, Steam, Epic, or PS Remote Play from inside the shell
+- Lobby coordination — host selects match type, players auto-assigned to teams, AI fills remaining slots
+- Randomized faction matchups — Republic vs Separatists, Rebels vs Empire, Resistance vs First Order
+- Voice chat overlay — WebRTC-based with STUN/TURN fallback
+- Persistent live text chat — available before, during, and after matches
+- One-match lifecycle — lobby dissolves after match ends
+- Browser-loadable — no downloads required
+- Electron shell optional — browser users get full experience with graceful fallback
+
+---
+
+## 🧱 Architecture
+
+### Frontend (`frontend/`)
+- React + TypeScript
+- Tailwind CSS or Material UI
+- Full-screen shell UI
+- Lobby manager
+- Voice chat overlay
+- Persistent chat panel
+- Game sync panel
+- Instructions dropdown
+- Manual fallback for game detection
+
+### Backend (`backend/`)
+- Node.js + WebSocket
+- Lobby coordination
+- Player sync engine (timestamped queues + interpolation)
+- Voice signaling (WebRTC)
+- Persistent chat server
+- CORS enabled for frontend communication
+
+### Voice (`voice/`)
+- WebRTC signaling
+- STUN/TURN fallback
+- Auto-reconnect logic
+
+### Electron Shell (`electron/`) — Optional
+- Captures and displays user’s desktop
+- Monitors window titles to detect Battlefront II
+- Launches game from inside shell
+- Signed and sandboxed to avoid antivirus issues
+
+---
+
+## 🔐 Security & Restrictions
+
+Battleconnect is designed with strict constraints:
+
+- ❌ No modding frameworks (e.g. Kyber)
+- ❌ No game file modification
+- ❌ No code injection
+- ❌ No DRM bypass
+- ❌ No emojis, placeholder UI, or fake loading screens
+- ✅ All user input is sanitized (chat, lobby names, display names)
+- ✅ HTTPS required for all traffic
+- ✅ WebSocket and WebRTC hardened
+- ✅ Electron shell sandboxed and signed
+- ✅ All fallback logic must be implemented
+
+---
+
+## 🌐 Deployment (Render)
+
+Battleconnect must be deployable from GitHub to **Render**:
+
+### Frontend
+- Deploy as a Static Site
+- Hosted at `https://battleconnect.onrender.com` or custom domain
+- Accessible via public HTTPS link
+
+### Backend
+- Deploy as a Web Service
+- Handles sync, chat, and voice signaling
+- CORS enabled for frontend access
+
+### Setup Steps
+1. Push full repo to GitHub
+2. Create two services on Render:
+   - Static Site → `frontend/`
+   - Web Service → `backend/`
+3. Set environment variables for TURN/STUN credentials
+4. Enable HTTPS and CORS
+5. Share the public link with players
+
+---
+
+## 🧪 Match Flow
+
+1. Launch Battleconnect in browser or Electron shell
+2. Use live desktop view (Electron) or your own desktop to launch Battlefront II
+3. Battleconnect detects the game or user confirms manually
+4. Lobby interface unlocks
+5. Host selects match type (Galactic Assault, Supremacy, etc.)
+6. Factions randomized, players auto-assigned
+7. AI fills remaining slots
+8. Voice and chat activate
+9. Match ends, lobby dissolves
+10. Players return to main screen
+
+---
+
+## 📁 Repo Structure
+
+battleconnect/
+├── frontend/       # React app with full UI and persistent chat
+├── backend/        # Node.js server with sync engine and chat
+├── voice/          # WebRTC signaling and fallback logic
+├── electron/       # Optional shell for desktop view and game detection
+├── tests/          # Unit tests for backend modules
+├── README.md       # This file
+├── LICENSE         # MIT or GPL recommended
+├── .gitignore      # Ignore node_modules, .env, build artifacts
+├── package.json    # Dependency manifest
+
+---
+
+## ✅ Build Requirements
+
+- ESLint and Prettier for formatting
+- Unit tests for backend modules
+- All UI elements must be functional and testable
+- All fallback states must be implemented and styled
+- Electron shell must be optional and not required for browser users
+
+---
+
+## 🧠 Summary
+
+Battleconnect is a real multiplayer shell for Battlefront II — no mods, no injection, no downloads. It runs in the browser, coordinates real matches, and is deployable to Render with one click. Build it exactly as specified. No shortcuts. No interpretation.

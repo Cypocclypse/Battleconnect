@@ -1,0 +1,50 @@
+{
+  "name": "battleconnect",
+  "version": "1.0.0",
+  "description": "Full-screen multiplayer shell for Star Wars Battlefront II (2017)",
+  "main": "index.js",
+  "scripts": {
+    "setup": "node setup.js",
+    "dev": "concurrently \"npm run dev:frontend\" \"npm run dev:backend\"",
+    "dev:frontend": "cd frontend && npm run dev",
+    "dev:backend": "cd backend && npm run dev",
+    "build": "npm run build:frontend && npm run build:backend",
+    "build:frontend": "cd frontend && npm run build",
+    "build:backend": "cd backend && npm run build",
+    "test": "npm run test:backend && npm run test:frontend",
+    "test:backend": "cd backend && npm test",
+    "test:frontend": "cd frontend && npm test",
+    "lint": "eslint . --ext .js,.jsx,.ts,.tsx",
+    "lint:fix": "eslint . --ext .js,.jsx,.ts,.tsx --fix",
+    "format": "prettier --write \"**/*.{js,jsx,ts,tsx,json,css,md}\"",
+    "install:all": "node setup.js"
+  },
+  "keywords": [
+    "battlefront",
+    "multiplayer",
+    "coordination",
+    "webrtc",
+    "react",
+    "nodejs"
+  ],
+  "author": "Battleconnect Team",
+  "license": "MIT",
+  "devDependencies": {
+    "@typescript-eslint/eslint-plugin": "^6.0.0",
+    "@typescript-eslint/parser": "^6.0.0",
+    "concurrently": "^8.2.0",
+    "eslint": "^8.45.0",
+    "eslint-config-prettier": "^8.8.0",
+    "eslint-plugin-prettier": "^5.0.0",
+    "eslint-plugin-react": "^7.33.0",
+    "eslint-plugin-react-hooks": "^4.6.0",
+    "prettier": "^3.0.0",
+    "typescript": "^5.1.0"
+  },
+  "workspaces": [
+    "frontend",
+    "backend",
+    "voice",
+    "electron"
+  ]
+}

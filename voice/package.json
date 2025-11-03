@@ -1,0 +1,14 @@
+{
+  "name": "battleconnect-voice",
+  "version": "1.0.0",
+  "description": "WebRTC voice signaling for Battleconnect",
+  "main": "dist/voice.js",
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc -w"
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "typescript": "^5.1.6"
+  }
+}

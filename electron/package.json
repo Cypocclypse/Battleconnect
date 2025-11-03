@@ -1,0 +1,46 @@
+{
+  "name": "battleconnect-electron",
+  "version": "1.0.0",
+  "description": "Electron shell for Battleconnect with desktop capture and game detection",
+  "main": "dist/main.js",
+  "scripts": {
+    "build": "tsc",
+    "dev": "electron .",
+    "pack": "electron-builder",
+    "dist": "electron-builder --publish=never"
+  },
+  "dependencies": {
+    "electron": "^27.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.4.5",
+    "@types/electron": "^1.6.10",
+    "typescript": "^5.1.6",
+    "electron-builder": "^24.6.3"
+  },
+  "build": {
+    "appId": "com.battleconnect.app",
+    "productName": "Battleconnect",
+    "directories": {
+      "output": "release"
+    },
+    "files": [
+      "dist/**/*",
+      "assets/**/*"
+    ],
+    "mac": {
+      "category": "public.app-category.games",
+      "target": "dmg"
+    },
+    "win": {
+      "target": "nsis"
+    },
+    "linux": {
+      "target": "AppImage"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true
+    }
+  }
+}

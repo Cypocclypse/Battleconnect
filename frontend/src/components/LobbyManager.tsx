@@ -230,7 +230,7 @@ export function LobbyManager({ socket, onJoinLobby, onLeaveLobby, hasGame, playe
                 You want to join: <strong>{selectedLobby.name}</strong>
               </p>
               <p className='text-imperial-300 text-sm mb-4'>
-                Since you don't have Battlefront II installed, you'll need someone in this lobby to host their game for you.
+                Since you don't have Battlefront II installed, you'll need someone in this lobby to share their game instance with you.
               </p>
               
               <div className='bg-imperial-700 p-3 rounded mb-4'>
@@ -285,7 +285,7 @@ export function LobbyManager({ socket, onJoinLobby, onLeaveLobby, hasGame, playe
             <div className='mt-4 p-3 bg-blue-900 rounded border border-blue-600'>
               <p className='text-blue-200 text-sm'>
                 <strong>How it works:</strong> Your request will be sent to all players in this lobby. 
-                If someone accepts, they'll host their Battlefront game and you can play through their screen.
+                If someone accepts, they'll share their Battlefront II game instance with you so you can both play.
               </p>
             </div>
           </div>

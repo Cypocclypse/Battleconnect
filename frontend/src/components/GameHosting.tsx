@@ -143,8 +143,8 @@ export const GameHosting: React.FC<GameHostingProps> = ({
           <div className="bg-gray-800 rounded p-4">
             <h4 className="font-semibold text-white mb-2">Host Your Game</h4>
             <div className="flex items-center justify-between">
-              <span className="text-gray-300">
-                Allow others to play through your Battlefront
+              <span className='text-gray-300'>
+                Share your Battlefront game with others
               </span>
               <button
                 onClick={toggleHosting}
@@ -159,7 +159,7 @@ export const GameHosting: React.FC<GameHostingProps> = ({
             </div>
             {isHostingEnabled && (
               <p className="text-green-400 text-sm mt-2">
-                ✓ You're available to host players without Battlefront
+                ✓ You're available to share your game with players without Battlefront
               </p>
             )}
           </div>
@@ -180,7 +180,7 @@ export const GameHosting: React.FC<GameHostingProps> = ({
                 </button>
               </div>
               <p className="text-green-300 text-sm mt-2">
-                The guest can now see and interact with your game
+                The guest can now access and play your Battlefront II alongside you
               </p>
             </div>
           )}
@@ -231,7 +231,7 @@ export const GameHosting: React.FC<GameHostingProps> = ({
             <div className="bg-gray-800 rounded p-4">
               <h4 className="font-semibold text-white mb-2">Request Game Access</h4>
               <p className="text-gray-300 mb-4">
-                You don't have Battlefront installed. Request another player to host their game for you.
+                You don't have Battlefront installed. Request another player to share their game instance with you.
               </p>
               
               {availableHosts.length > 0 ? (
@@ -264,10 +264,10 @@ export const GameHosting: React.FC<GameHostingProps> = ({
             <div className="bg-green-900 rounded p-4 border border-green-600">
               <h4 className="font-semibold text-green-400 mb-2">Connected as Guest</h4>
               <p className="text-white">
-                You're now connected to a host's Battlefront game!
+                You're now sharing a host's Battlefront game!
               </p>
               <p className="text-green-300 text-sm mt-2">
-                You can see and interact with the game through your host's screen
+                You can play Battlefront II using their game instance while they continue playing
               </p>
               <div className="mt-3">
                 <button
@@ -290,9 +290,9 @@ export const GameHosting: React.FC<GameHostingProps> = ({
       {/* Instructions */}
       <div className="mt-4 p-3 bg-gray-800 rounded border-l-4 border-yellow-600">
         <p className="text-yellow-300 text-sm">
-          <strong>How it works:</strong> Players with Battlefront can host their game, 
-          allowing players without the game to connect and play together. The host maintains 
-          full control while the guest can see and interact through the shared screen.
+          <strong>How it works:</strong> Players with Battlefront can share their game instance, 
+          allowing players without the game to access and play Battlefront II. Both players can 
+          play simultaneously - the host continues playing normally while the guest uses the shared instance.
         </p>
       </div>
     </div>

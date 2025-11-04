@@ -6,7 +6,6 @@ import { PersistentChat } from './components/PersistentChat';
 import { GameSyncPanel } from './components/GameSyncPanel';
 import { InstructionsDropdown } from './components/InstructionsDropdown';
 import { GameHosting } from './components/GameHosting';
-import { DesktopCapture } from './components/DesktopCapture';
 import { useWebSocket } from './hooks/useWebSocket';
 import { useGameDetection } from './hooks/useGameDetection';
 
@@ -150,65 +149,83 @@ function App() {
                 </div>
                 <div className='panel-content flex-1 overflow-hidden'>
                   {hasGameOwnership ? (
-                    <div className='h-full w-full bg-black rounded flex flex-col'>
-                      {/* Desktop View Header */}
+                    <div className='h-full w-full flex flex-col'>
+                      {/* Match Coordination Header */}
                       <div className='p-4 border-b' style={{borderColor: '#495057'}}>
-                        <h3 className='text-lg font-bold text-white mb-2'>Desktop View</h3>
+                        <h3 className='text-lg font-bold text-white mb-2'>Battlefront II Match Coordination</h3>
                         <p className='text-sm' style={{color: '#ced4da'}}>
-                          Launch Battlefront II from your desktop (EA App, Steam, Epic, or PS Remote Play)
+                          Join coordinated multiplayer matches with other players
                         </p>
                       </div>
                       
-                      {/* Desktop Area */}
-                      <div className='flex-1 flex items-center justify-center p-4'>
-                        <DesktopCapture />
+                      {/* Match Info Area */}
+                      <div className='flex-1 p-6 flex items-center justify-center'>
+                        {inLobby ? (
+                          <div className='text-center max-w-md'>
+                            <div className='mb-6' style={{fontSize: '4rem'}}>⚔️</div>
+                            <h3 className='text-2xl font-bold text-white mb-4'>Ready for Coordinated Match</h3>
+                            <p className='text-gray-400 mb-6'>
+                              Launch Battlefront II and join the same multiplayer lobby as your teammates
+                            </p>
+                            <div className='space-y-3 text-sm' style={{color: '#ced4da'}}>
+                              <div className='p-3 rounded' style={{backgroundColor: '#212529'}}>
+                                <p className='font-semibold mb-2'>🎯 Match Instructions:</p>
+                                <p>1. Launch Battlefront II</p>
+                                <p>2. Go to Multiplayer</p>
+                                <p>3. Join the same game mode/map</p>
+                                <p>4. Coordinate via voice chat</p>
+                              </div>
+                            </div>
+                          </div>
+                        ) : (
+                          <div className='text-center'>
+                            <div className='mb-6' style={{fontSize: '4rem'}}>🎮</div>
+                            <h3 className='text-2xl font-bold text-white mb-4'>Join a Lobby</h3>
+                            <p className='text-gray-400 mb-6'>
+                              Create or join a lobby to coordinate Battlefront II matches with other players
+                            </p>
+                          </div>
+                        )}
                       </div>
                     </div>
                   ) : (
-                    <div className='h-full w-full bg-black rounded flex flex-col'>
-                      {/* Hosted Game View Header */}
+                    <div className='h-full w-full flex flex-col'>
+                      {/* Hosted Match Header */}
                       <div className='p-4 border-b' style={{borderColor: '#495057'}}>
-                        <h3 className='text-lg font-bold text-white mb-2'>Hosted Battlefront II</h3>
+                        <h3 className='text-lg font-bold text-white mb-2'>Hosted Match Participation</h3>
                         <p className='text-sm' style={{color: '#ced4da'}}>
-                          Playing via hosted connection - you'll see and control the host's game
+                          Join Battlefront II matches through game owners who can host you
                         </p>
                       </div>
                       
-                      {/* Game Stream Area */}
-                      <div className='flex-1 flex items-center justify-center p-4'>
-                        <div className='w-full h-full flex items-center justify-center'>
-                          {inLobby ? (
-                            <div className='text-center'>
-                              <div className='mb-6' style={{fontSize: '4rem'}}>🎮</div>
-                              <h3 className='text-xl font-bold text-white mb-4'>Connected to Host's Game</h3>
-                              <p className='text-gray-400 mb-6'>
-                                Battlefront II will appear here when host starts their game
-                              </p>
-                              <div className='p-4 rounded border' style={{backgroundColor: '#212529', borderColor: '#495057'}}>
-                                <div className='flex items-center space-x-2 mb-2'>
-                                  <div className='w-2 h-2 rounded-full bg-green-500 animate-pulse' />
-                                  <span className='text-sm text-white'>Connected to host</span>
-                                </div>
-                                <p className='text-xs' style={{color: '#ced4da'}}>
-                                  🎯 You can control the host's game using your keyboard and mouse
-                                </p>
+                      {/* Hosting Info Area */}
+                      <div className='flex-1 p-6 flex items-center justify-center'>
+                        {inLobby ? (
+                          <div className='text-center max-w-md'>
+                            <div className='mb-6' style={{fontSize: '4rem'}}>🤝</div>
+                            <h3 className='text-2xl font-bold text-white mb-4'>Request Game Hosting</h3>
+                            <p className='text-gray-400 mb-6'>
+                              Ask lobby members who own Battlefront II to host you in their matches
+                            </p>
+                            <div className='space-y-3 text-sm' style={{color: '#ced4da'}}>
+                              <div className='p-3 rounded' style={{backgroundColor: '#212529'}}>
+                                <p className='font-semibold mb-2'>🎯 How It Works:</p>
+                                <p>1. Request hosting from game owners</p>
+                                <p>2. They invite you to their match</p>
+                                <p>3. Join the same multiplayer lobby</p>
+                                <p>4. Play together in coordinated teams</p>
                               </div>
                             </div>
-                          ) : (
-                            <div className='text-center'>
-                              <div className='mb-6' style={{fontSize: '4rem'}}>🔍</div>
-                              <h3 className='text-xl font-bold text-white mb-4'>Find a Host</h3>
-                              <p className='text-gray-400 mb-6'>
-                                Join a lobby and request hosting from players who own Battlefront II
-                              </p>
-                              <div className='p-4 rounded border' style={{backgroundColor: '#212529', borderColor: '#495057'}}>
-                                <p className='text-sm' style={{color: '#ced4da'}}>
-                                  💡 Once connected, you'll play Battlefront II through the host's game
-                                </p>
-                              </div>
-                            </div>
-                          )}
-                        </div>
+                          </div>
+                        ) : (
+                          <div className='text-center'>
+                            <div className='mb-6' style={{fontSize: '4rem'}}>🔍</div>
+                            <h3 className='text-2xl font-bold text-white mb-4'>Find Game Owners</h3>
+                            <p className='text-gray-400 mb-6'>
+                              Join a lobby to find players who own Battlefront II and can host matches
+                            </p>
+                          </div>
+                        )}
                       </div>
                     </div>
                   )}

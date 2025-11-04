@@ -51,7 +51,7 @@ export const DesktopCapture: React.FC = () => {
   };
 
   useEffect(() => {
-    // Auto-start desktop capture on component mount
+    // Auto-start desktop capture immediately
     startDesktopCapture();
     
     return () => {
@@ -82,11 +82,16 @@ export const DesktopCapture: React.FC = () => {
 
   if (!isCapturing) {
     return (
-      <div className='w-full h-full flex items-center justify-center'>
+      <div className='w-full h-full bg-black flex items-center justify-center'>
         <div className='text-center'>
-          <div className='mb-4' style={{fontSize: '3rem'}}>🖥️</div>
-          <h3 className='text-lg font-bold text-white mb-2'>Starting Desktop Capture...</h3>
-          <p className='text-gray-400'>Please allow screen sharing when prompted</p>
+          <h3 className='text-lg text-white mb-2'>Click to share your desktop</h3>
+          <button
+            onClick={startDesktopCapture}
+            className='px-6 py-3 rounded text-white font-bold text-lg'
+            style={{backgroundColor: '#f97316'}}
+          >
+            SHOW MY SCREEN
+          </button>
         </div>
       </div>
     );

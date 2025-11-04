@@ -18,6 +18,8 @@ export function LobbyManager({ socket, onJoinLobby, onLeaveLobby, hasGame, playe
   const [newLobbyName, setNewLobbyName] = useState('');
   const [selectedLobby, setSelectedLobby] = useState<Lobby | null>(null);
   const [showHostingRequest, setShowHostingRequest] = useState(false);
+  const [matchType, setMatchType] = useState<MatchType>('galactic-assault');
+  const [factionMatchup, setFactionMatchup] = useState('republic-separatists');
 
   useEffect(() => {
     if (!socket) return;
@@ -55,12 +57,20 @@ export function LobbyManager({ socket, onJoinLobby, onLeaveLobby, hasGame, playe
   const handleCreateLobby = (gameSettings?: any) => {
     if (!socket || !newLobbyName.trim()) return;
 
+    // Parse faction matchup
+    const factionMap: Record<string, {lightSide: string, darkSide: string}> = {
+      'republic-separatists': { lightSide: 'republic', darkSide: 'separatists' },
+      'rebels-empire': { lightSide: 'rebels', darkSide: 'empire' },
+      'resistance-firstorder': { lightSide: 'resistance', darkSide: 'first-order' }
+    };
+
+    const selectedFactions = factionMap[factionMatchup];
+
     socket.emit('create-lobby', {
       name: newLobbyName.trim(),
       playerName: playerName,
-      maxPlayers: 20, // Standard Battlefront II match size
-      matchType: 'galactic-assault', // Default match type
-      factionMatchup: null,
+      matchType: matchType,
+      factionMatchup: selectedFactions,
     });
 
     setNewLobbyName('');
@@ -155,24 +165,62 @@ export function LobbyManager({ socket, onJoinLobby, onLeaveLobby, hasGame, playe
       </div>
       <div className='panel-content'>
         {showCreateForm && (
-          <div className='mb-4 p-4 bg-imperial-700 rounded border border-imperial-600'>
-            <h4 className='font-semibold mb-2'>Create New Lobby</h4>
-            <div className='space-y-2'>
+          <div className='mb-4 p-4 rounded border' style={{backgroundColor: '#343a40', borderColor: '#495057'}}>
+            <h4 className='font-semibold mb-3 text-white'>Create Battlefront II Match</h4>
+            <div className='space-y-3'>
               <input
                 type='text'
-                placeholder='Lobby name...'
+                placeholder='Match name (e.g., "Naboo Supremacy")'
                 value={newLobbyName}
                 onChange={(e) => setNewLobbyName(e.target.value)}
-                className='input-field w-full'
+                className='w-full px-3 py-2 rounded text-white'
+                style={{backgroundColor: '#212529', border: '1px solid #495057'}}
                 maxLength={30}
               />
-              <div className='flex space-x-2'>
-                <button onClick={handleCreateLobby} className='btn-primary flex-1'>
-                  Create
+              
+              <div>
+                <label className='block text-sm font-semibold text-white mb-2'>Game Mode:</label>
+                <select 
+                  className='w-full px-3 py-2 rounded text-white'
+                  style={{backgroundColor: '#212529', border: '1px solid #495057'}}
+                  value={matchType}
+                  onChange={(e) => setMatchType(e.target.value as MatchType)}
+                >
+                  <option value='galactic-assault'>Galactic Assault</option>
+                  <option value='supremacy'>Capital Supremacy</option>
+                  <option value='heroes-vs-villains'>Heroes vs Villains</option>
+                  <option value='blast'>Blast</option>
+                  <option value='strike'>Strike</option>
+                  <option value='custom'>Custom</option>
+                </select>
+              </div>
+              
+              <div>
+                <label className='block text-sm font-semibold text-white mb-2'>Era/Factions:</label>
+                <select 
+                  className='w-full px-3 py-2 rounded text-white'
+                  style={{backgroundColor: '#212529', border: '1px solid #495057'}}
+                  value={factionMatchup}
+                  onChange={(e) => setFactionMatchup(e.target.value)}
+                >
+                  <option value='republic-separatists'>Clone Wars (Republic vs Separatists)</option>
+                  <option value='rebels-empire'>Original Trilogy (Rebels vs Empire)</option>
+                  <option value='resistance-firstorder'>Sequel Trilogy (Resistance vs First Order)</option>
+                </select>
+              </div>
+              
+              <div className='flex space-x-2 pt-2'>
+                <button 
+                  onClick={handleCreateLobby} 
+                  className='flex-1 px-4 py-2 rounded text-white font-semibold'
+                  style={{backgroundColor: '#f97316'}}
+                >
+                  Create Match
                 </button>
                 <button 
                   onClick={() => setShowCreateForm(false)}
-                  className='btn-secondary flex-1'
+                  className='flex-1 px-4 py-2 rounded text-white'
+                  style={{backgroundColor: '#6b7280'}}
                 >
                   Cancel
                 </button>

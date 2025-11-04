@@ -75,9 +75,9 @@ function App() {
         )}
 
         {/* Main Interface */}
-        <div className='flex-1 flex'>
+        <div className='flex-1 flex min-h-0'>
           {/* Left Panel - Game Detection & Lobby */}
-          <div className='w-1/3 p-6 space-y-6 overflow-y-auto flex-1 min-h-0'>
+          <div className='w-80 p-4 space-y-4 overflow-y-auto min-h-0 flex-shrink-0'>
             {!gameDetected ? (
               <GameDetection onGameConfirmed={() => setGameDetected(true)} />
             ) : (
@@ -103,18 +103,18 @@ function App() {
           </div>
 
           {/* Center - Main View */}
-          <div className='flex-1 p-6 overflow-y-auto min-h-0'>
+          <div className='flex-1 p-4 overflow-y-auto min-h-0'>
             {gameDetected ? (
-              <div className='panel h-full'>
+              <div className='panel h-full flex flex-col'>
                 <div className='panel-header'>
                   <h2>Battlefront II Coordination</h2>
                 </div>
-                <div className='panel-content flex-1'>
-                  <div className='h-full flex items-center justify-center'>
+                <div className='panel-content flex-1 overflow-hidden'>
+                  <div className='h-full w-full bg-black rounded flex items-center justify-center'>
                     <div className='text-center'>
-                      <h3 className='text-2xl font-orbitron mb-4'>Game Detected</h3>
+                      <h3 className='text-2xl font-orbitron mb-4'>Desktop View</h3>
                       <p className='text-imperial-300 mb-6'>
-                        Battlefront II is running. Use the lobby panel to coordinate matches.
+                        Game instance will be displayed here when hosting is active.
                       </p>
                       {!inLobby && (
                         <p className='text-rebel-400'>Join or create a lobby to begin coordination.</p>
@@ -124,12 +124,12 @@ function App() {
                 </div>
               </div>
             ) : (
-              <div className='panel h-full'>
+              <div className='panel h-full flex flex-col'>
                 <div className='panel-header'>
                   <h2>Welcome to Battleconnect</h2>
                 </div>
-                <div className='panel-content flex-1'>
-                  <div className='h-full flex items-center justify-center'>
+                <div className='panel-content flex-1 overflow-hidden'>
+                  <div className='h-full w-full bg-black rounded flex items-center justify-center'>
                     <div className='text-center'>
                       <h3 className='text-2xl font-orbitron mb-4'>Launch Battlefront II</h3>
                       <p className='text-imperial-300 mb-6'>
@@ -146,7 +146,7 @@ function App() {
           </div>
 
           {/* Right Panel - Chat & Voice */}
-          <div className='w-1/3 p-6 space-y-6 flex flex-col min-h-0 flex-1'>
+          <div className='w-80 p-4 space-y-4 flex flex-col min-h-0 flex-shrink-0'>
             {/* Voice Chat */}
             <VoiceChat socket={socket} />
 

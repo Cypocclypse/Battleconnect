@@ -118,8 +118,8 @@ function App() {
                       </div>
                       <div className='text-xs' style={{color: '#ced4da'}}>
                         {hasGameOwnership 
-                          ? 'You can create or join any room'
-                          : 'You can request hosting from room members'
+                          ? 'Game owner - can launch and create rooms'
+                          : 'Hosted player - will connect to someone else\'s game'
                         }
                       </div>
                     </div>
@@ -144,23 +144,42 @@ function App() {
             {gameDetected ? (
               <div className='panel h-full flex flex-col'>
                 <div className='panel-header'>
-                  <h2>Battlefront II Coordination</h2>
+                  <h2>
+                    {hasGameOwnership ? 'Battlefront II Coordination' : 'Waiting for Host Connection'}
+                  </h2>
                 </div>
                 <div className='panel-content flex-1 overflow-hidden'>
-                  <div className='h-full w-full bg-black rounded flex flex-col'>
-                    {/* Desktop View Header */}
-                    <div className='p-4 border-b' style={{borderColor: '#495057'}}>
-                      <h3 className='text-lg font-bold text-white mb-2'>Desktop View</h3>
-                      <p className='text-sm' style={{color: '#ced4da'}}>
-                        Launch Battlefront II from your desktop (EA App, Steam, Epic, or PS Remote Play)
-                      </p>
+                  {hasGameOwnership ? (
+                    <div className='h-full w-full bg-black rounded flex flex-col'>
+                      {/* Desktop View Header */}
+                      <div className='p-4 border-b' style={{borderColor: '#495057'}}>
+                        <h3 className='text-lg font-bold text-white mb-2'>Desktop View</h3>
+                        <p className='text-sm' style={{color: '#ced4da'}}>
+                          Launch Battlefront II from your desktop (EA App, Steam, Epic, or PS Remote Play)
+                        </p>
+                      </div>
+                      
+                      {/* Desktop Area */}
+                      <div className='flex-1 flex items-center justify-center p-4'>
+                        <DesktopCapture />
+                      </div>
                     </div>
-                    
-                    {/* Desktop Area */}
-                    <div className='flex-1 flex items-center justify-center p-4'>
-                      <DesktopCapture />
+                  ) : (
+                    <div className='h-full w-full bg-black rounded flex items-center justify-center'>
+                      <div className='text-center'>
+                        <div className='mb-6' style={{fontSize: '4rem'}}>🎮</div>
+                        <h3 className='text-xl font-bold text-white mb-4'>Waiting for Game Host</h3>
+                        <p className='text-gray-400 mb-6'>
+                          You'll be connected to a host's Battlefront II game instance
+                        </p>
+                        <div className='p-4 rounded border' style={{backgroundColor: '#212529', borderColor: '#495057'}}>
+                          <p className='text-sm' style={{color: '#ced4da'}}>
+                            💡 Request hosting from players who own the game in the lobby
+                          </p>
+                        </div>
+                      </div>
                     </div>
-                  </div>
+                  )}
                 </div>
               </div>
             ) : (

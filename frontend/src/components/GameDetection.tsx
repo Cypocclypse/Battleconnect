@@ -46,7 +46,7 @@ export function GameDetection({ onGameConfirmed }: GameDetectionProps) {
                 />
                 <div>
                   <div className='font-semibold text-white'>I have Battlefront II</div>
-                  <div className='text-sm' style={{color: '#ced4da'}}>Launch game and join rooms directly</div>
+                  <div className='text-sm' style={{color: '#ced4da'}}>Access desktop view and create/join rooms</div>
                 </div>
               </label>
             </div>
@@ -65,7 +65,7 @@ export function GameDetection({ onGameConfirmed }: GameDetectionProps) {
                 />
                 <div>
                   <div className='font-semibold text-white'>I don't have Battlefront II</div>
-                  <div className='text-sm' style={{color: '#ced4da'}}>Request hosting from other players</div>
+                  <div className='text-sm' style={{color: '#ced4da'}}>Connect to hosted game instances from other players</div>
                 </div>
               </label>
             </div>

@@ -6,7 +6,6 @@ import { PersistentChat } from './components/PersistentChat';
 import { GameSyncPanel } from './components/GameSyncPanel';
 import { InstructionsDropdown } from './components/InstructionsDropdown';
 import { GameHosting } from './components/GameHosting';
-import { ScreenStreaming } from './components/ScreenStreaming';
 import { useWebSocket } from './hooks/useWebSocket';
 import { useGameDetection } from './hooks/useGameDetection';
 
@@ -14,9 +13,7 @@ function App() {
   const [gameDetected, setGameDetected] = useState(false);
   const [inLobby, setInLobby] = useState(false);
   const [showInstructions, setShowInstructions] = useState(false);
-  const [isHost, setIsHost] = useState(false);
-  const [isGuest, setIsGuest] = useState(false);
-  const [sessionId, setSessionId] = useState<string | undefined>();
+  const [hasGameOwnership, setHasGameOwnership] = useState(false);
   const [playerName, setPlayerName] = useState(
     localStorage.getItem('battleconnect-player-name') || `Player_${Math.random().toString(36).substr(2, 6)}`
   );
@@ -81,7 +78,10 @@ function App() {
           {/* Left Panel - Game Detection & Lobby */}
           <div className='w-80 p-4 space-y-4 overflow-y-auto min-h-0 flex-shrink-0'>
             {!gameDetected ? (
-              <GameDetection onGameConfirmed={() => setGameDetected(true)} />
+              <GameDetection onGameConfirmed={(hasGame) => {
+                setGameDetected(true);
+                setHasGameOwnership(hasGame);
+              }} />
             ) : (
               <LobbyManager 
                 socket={socket} 
@@ -100,57 +100,33 @@ function App() {
               hasGame={gameDetected || isGameRunning}
             />
 
-            {/* Desktop Sharing Controls */}
+            {/* Room Status */}
             {(gameDetected || isGameRunning) && (
               <div className='panel'>
                 <div className='panel-header'>
-                  <h2>Desktop Sharing</h2>
+                  <h2>Room Status</h2>
                 </div>
                 <div className='panel-content'>
                   <div className='space-y-3'>
-                    {!isHost && !isGuest && (
-                      <button
-                        onClick={() => {
-                          setIsHost(true);
-                          setSessionId(`session_${Date.now()}`);
-                        }}
-                        className='w-full px-4 py-2 rounded text-white font-semibold'
-                        style={{backgroundColor: '#f97316'}}
-                      >
-                        Start Hosting Desktop
-                      </button>
-                    )}
-                    
-                    {isHost && (
-                      <div className='text-sm' style={{color: '#ced4da'}}>
-                        <p>✅ You are hosting</p>
-                        <p>Session: {sessionId}</p>
-                        <button
-                          onClick={() => {
-                            setIsHost(false);
-                            setSessionId(undefined);
-                          }}
-                          className='mt-2 px-3 py-1 rounded text-white text-sm'
-                          style={{backgroundColor: '#dc2626'}}
-                        >
-                          Stop Hosting
-                        </button>
+                    <div className='p-3 rounded' style={{backgroundColor: '#212529'}}>
+                      <div className='flex items-center space-x-2 mb-2'>
+                        <div className={`w-2 h-2 rounded-full ${inLobby ? 'bg-green-500' : 'bg-gray-500'}`} />
+                        <span className='text-sm font-semibold text-white'>
+                          {inLobby ? 'In Room' : 'Not in Room'}
+                        </span>
                       </div>
-                    )}
+                      <div className='text-xs' style={{color: '#ced4da'}}>
+                        {hasGameOwnership 
+                          ? 'You can create or join any room'
+                          : 'You can request hosting from room members'
+                        }
+                      </div>
+                    </div>
                     
-                    {isGuest && (
-                      <div className='text-sm' style={{color: '#ced4da'}}>
-                        <p>👁️ You are viewing</p>
-                        <button
-                          onClick={() => {
-                            setIsGuest(false);
-                            setSessionId(undefined);
-                          }}
-                          className='mt-2 px-3 py-1 rounded text-white text-sm'
-                          style={{backgroundColor: '#6b7280'}}
-                        >
-                          Stop Viewing
-                        </button>
+                    {inLobby && (
+                      <div className='text-xs' style={{color: '#6c757d'}}>
+                        <p>✅ Connected to multiplayer coordination</p>
+                        <p>🎮 Ready for synchronized matches</p>
                       </div>
                     )}
                   </div>
@@ -169,13 +145,33 @@ function App() {
                 <div className='panel-header'>
                   <h2>Battlefront II Coordination</h2>
                 </div>
-                <div className='panel-content flex-1 overflow-hidden p-0'>
-                  <ScreenStreaming
-                    isHost={isHost}
-                    isGuest={isGuest}
-                    sessionId={sessionId}
-                    socket={socket}
-                  />
+                <div className='panel-content flex-1 overflow-hidden'>
+                  <div className='h-full w-full bg-black rounded flex flex-col'>
+                    {/* Desktop View Header */}
+                    <div className='p-4 border-b' style={{borderColor: '#495057'}}>
+                      <h3 className='text-lg font-bold text-white mb-2'>Desktop View</h3>
+                      <p className='text-sm' style={{color: '#ced4da'}}>
+                        Launch Battlefront II from your desktop (EA App, Steam, Epic, or PS Remote Play)
+                      </p>
+                    </div>
+                    
+                    {/* Desktop Area */}
+                    <div className='flex-1 flex items-center justify-center p-8'>
+                      <div className='text-center'>
+                        <div className='mb-6' style={{fontSize: '4rem'}}>🖥️</div>
+                        <h3 className='text-xl font-bold text-white mb-4'>Your Desktop</h3>
+                        <p className='text-gray-400 mb-6'>
+                          Use your desktop to launch Battlefront II through any platform
+                        </p>
+                        <div className='space-y-2 text-sm' style={{color: '#ced4da'}}>
+                          <p>• EA App (PC)</p>
+                          <p>• Steam (PC)</p>
+                          <p>• Epic Games (PC)</p>
+                          <p>• PS Remote Play (Console)</p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
                 </div>
               </div>
             ) : (

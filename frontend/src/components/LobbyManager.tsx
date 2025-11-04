@@ -46,7 +46,7 @@ export function LobbyManager({ socket, onJoinLobby, onLeaveLobby, hasGame, playe
     };
   }, [socket, onJoinLobby, onLeaveLobby]);
 
-  const handleCreateLobby = () => {
+  const handleCreateLobby = (gameSettings?: any) => {
     if (!socket || !newLobbyName.trim()) return;
 
     socket.emit('create-lobby', {

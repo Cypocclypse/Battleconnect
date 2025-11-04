@@ -22,6 +22,11 @@ export function LobbyManager({ socket, onJoinLobby, onLeaveLobby, hasGame, playe
   useEffect(() => {
     if (!socket) return;
 
+    socket.on('lobby-list', (updatedLobbies: Lobby[]) => {
+      setLobbies(updatedLobbies);
+    });
+    
+    // Also listen for the old event name for compatibility
     socket.on('lobbies-updated', (updatedLobbies: Lobby[]) => {
       setLobbies(updatedLobbies);
     });
@@ -36,10 +41,11 @@ export function LobbyManager({ socket, onJoinLobby, onLeaveLobby, hasGame, playe
       onLeaveLobby();
     });
 
-    // Request initial lobby list
+    // Request initial lobby list  
     socket.emit('get-lobbies');
 
     return () => {
+      socket.off('lobby-list');
       socket.off('lobbies-updated');
       socket.off('lobby-joined');
       socket.off('lobby-left');
@@ -51,7 +57,10 @@ export function LobbyManager({ socket, onJoinLobby, onLeaveLobby, hasGame, playe
 
     socket.emit('create-lobby', {
       name: newLobbyName.trim(),
+      playerName: playerName,
       maxPlayers: 20, // Standard Battlefront II match size
+      matchType: 'galactic-assault', // Default match type
+      factionMatchup: null,
     });
 
     setNewLobbyName('');

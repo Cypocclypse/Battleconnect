@@ -6,6 +6,7 @@ import { PersistentChat } from './components/PersistentChat';
 import { GameSyncPanel } from './components/GameSyncPanel';
 import { InstructionsDropdown } from './components/InstructionsDropdown';
 import { GameHosting } from './components/GameHosting';
+import { ScreenStreaming } from './components/ScreenStreaming';
 import { useWebSocket } from './hooks/useWebSocket';
 import { useGameDetection } from './hooks/useGameDetection';
 
@@ -13,6 +14,9 @@ function App() {
   const [gameDetected, setGameDetected] = useState(false);
   const [inLobby, setInLobby] = useState(false);
   const [showInstructions, setShowInstructions] = useState(false);
+  const [isHost, setIsHost] = useState(false);
+  const [isGuest, setIsGuest] = useState(false);
+  const [sessionId, setSessionId] = useState<string | undefined>();
   const [playerName, setPlayerName] = useState(
     localStorage.getItem('battleconnect-player-name') || `Player_${Math.random().toString(36).substr(2, 6)}`
   );
@@ -96,6 +100,64 @@ function App() {
               hasGame={gameDetected || isGameRunning}
             />
 
+            {/* Desktop Sharing Controls */}
+            {(gameDetected || isGameRunning) && (
+              <div className='panel'>
+                <div className='panel-header'>
+                  <h2>Desktop Sharing</h2>
+                </div>
+                <div className='panel-content'>
+                  <div className='space-y-3'>
+                    {!isHost && !isGuest && (
+                      <button
+                        onClick={() => {
+                          setIsHost(true);
+                          setSessionId(`session_${Date.now()}`);
+                        }}
+                        className='w-full px-4 py-2 rounded text-white font-semibold'
+                        style={{backgroundColor: '#f97316'}}
+                      >
+                        Start Hosting Desktop
+                      </button>
+                    )}
+                    
+                    {isHost && (
+                      <div className='text-sm' style={{color: '#ced4da'}}>
+                        <p>✅ You are hosting</p>
+                        <p>Session: {sessionId}</p>
+                        <button
+                          onClick={() => {
+                            setIsHost(false);
+                            setSessionId(undefined);
+                          }}
+                          className='mt-2 px-3 py-1 rounded text-white text-sm'
+                          style={{backgroundColor: '#dc2626'}}
+                        >
+                          Stop Hosting
+                        </button>
+                      </div>
+                    )}
+                    
+                    {isGuest && (
+                      <div className='text-sm' style={{color: '#ced4da'}}>
+                        <p>👁️ You are viewing</p>
+                        <button
+                          onClick={() => {
+                            setIsGuest(false);
+                            setSessionId(undefined);
+                          }}
+                          className='mt-2 px-3 py-1 rounded text-white text-sm'
+                          style={{backgroundColor: '#6b7280'}}
+                        >
+                          Stop Viewing
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+            )}
+
             {/* Game Sync Panel */}
             {inLobby && <GameSyncPanel socket={socket} />}
           </div>
@@ -107,18 +169,13 @@ function App() {
                 <div className='panel-header'>
                   <h2>Battlefront II Coordination</h2>
                 </div>
-                <div className='panel-content flex-1 overflow-hidden'>
-                  <div className='h-full w-full bg-black rounded flex items-center justify-center'>
-                    <div className='text-center'>
-                      <h3 className='text-2xl font-orbitron mb-4'>Desktop View</h3>
-                      <p className='text-imperial-300 mb-6'>
-                        Game instance will be displayed here when hosting is active.
-                      </p>
-                      {!inLobby && (
-                        <p className='text-rebel-400'>Join or create a lobby to begin coordination.</p>
-                      )}
-                    </div>
-                  </div>
+                <div className='panel-content flex-1 overflow-hidden p-0'>
+                  <ScreenStreaming
+                    isHost={isHost}
+                    isGuest={isGuest}
+                    sessionId={sessionId}
+                    socket={socket}
+                  />
                 </div>
               </div>
             ) : (

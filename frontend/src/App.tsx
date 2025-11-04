@@ -88,7 +88,7 @@ function App() {
                 socket={socket} 
                 onJoinLobby={() => setInLobby(true)}
                 onLeaveLobby={() => setInLobby(false)}
-                hasGame={gameDetected || isGameRunning}
+                hasGame={hasGameOwnership}
                 playerId={playerId}
                 playerName={playerName}
               />
@@ -98,7 +98,7 @@ function App() {
             <GameHosting
               playerId={playerId}
               playerName={playerName}
-              hasGame={gameDetected || isGameRunning}
+              hasGame={hasGameOwnership}
             />
 
             {/* Room Status */}

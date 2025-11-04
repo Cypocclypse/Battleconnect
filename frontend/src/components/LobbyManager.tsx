@@ -138,8 +138,8 @@ export function LobbyManager({ socket, onJoinLobby, onLeaveLobby, hasGame, playe
               Create
             </button>
           ) : (
-            <div className='text-sm text-gray-400'>
-              Need Battlefront to create rooms
+            <div className='text-xs' style={{color: '#6c757d'}}>
+              Only game owners can create lobbies
             </div>
           )}
         </div>

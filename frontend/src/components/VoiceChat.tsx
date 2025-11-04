@@ -157,14 +157,14 @@ export function VoiceChat({ socket }: VoiceChatProps) {
   };
 
   return (
-    <div className='panel h-64'>
+    <div className='panel flex-none'>
       <div className='panel-header'>
         <div className='flex items-center justify-between'>
           <h2>Voice Chat</h2>
           <div className={`w-2 h-2 rounded-full ${connected ? 'bg-green-500' : 'bg-gray-500'}`} />
         </div>
       </div>
-      <div className='panel-content flex flex-col h-full'>
+      <div className='panel-content flex flex-col'>
         {!connected ? (
           <div className='flex-1 flex items-center justify-center'>
             <div className='text-center'>

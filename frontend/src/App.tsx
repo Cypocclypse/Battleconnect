@@ -77,7 +77,7 @@ function App() {
         {/* Main Interface */}
         <div className='flex-1 flex'>
           {/* Left Panel - Game Detection & Lobby */}
-          <div className='w-1/3 p-6 space-y-6 overflow-y-auto h-full'>
+          <div className='w-1/3 p-6 space-y-6 overflow-y-auto flex-1 min-h-0'>
             {!gameDetected ? (
               <GameDetection onGameConfirmed={() => setGameDetected(true)} />
             ) : (
@@ -103,7 +103,7 @@ function App() {
           </div>
 
           {/* Center - Main View */}
-          <div className='flex-1 p-6 overflow-y-auto'>
+          <div className='flex-1 p-6 overflow-y-auto min-h-0'>
             {gameDetected ? (
               <div className='panel h-full'>
                 <div className='panel-header'>
@@ -146,7 +146,7 @@ function App() {
           </div>
 
           {/* Right Panel - Chat & Voice */}
-          <div className='w-1/3 p-6 space-y-6 overflow-y-auto h-full'>
+          <div className='w-1/3 p-6 space-y-6 flex flex-col min-h-0 flex-1'>
             {/* Voice Chat */}
             <VoiceChat socket={socket} />
 

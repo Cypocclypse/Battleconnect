@@ -45,10 +45,10 @@
     background: #1f2937;
   }
 
-  /* Make sure panels can scroll */
+  /* Ensure proper flex behavior for panels */
   .panel-content {
-    max-height: calc(100vh - 200px);
     overflow-y: auto;
+    min-height: 0;
   }
 }
 

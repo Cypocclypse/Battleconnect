@@ -53,7 +53,7 @@ export function PersistentChat({ socket }: PersistentChatProps) {
   const sendMessage = () => {
     if (!socket || !newMessage.trim()) return;
 
-    const sanitizedMessage = newMessage.trim().slice(0, 500); // Sanitize input
+    const sanitizedMessage = newMessage.trim(); // No character limit
 
     socket.emit('send-chat-message', {
       message: sanitizedMessage,
@@ -78,13 +78,13 @@ export function PersistentChat({ socket }: PersistentChatProps) {
   };
 
   return (
-    <div className='panel flex-1'>
+    <div className='panel flex-1 flex flex-col'>
       <div className='panel-header'>
         <h2>Global Chat</h2>
       </div>
-      <div className='panel-content flex flex-col h-full p-0'>
+      <div className='panel-content flex flex-col flex-1 p-0 min-h-0'>
         {/* Messages Area */}
-        <div className='flex-1 overflow-y-auto p-4 space-y-2 max-h-64'>
+        <div className='flex-1 overflow-y-auto p-4 space-y-2 min-h-0'>
           {messages.length === 0 ? (
             <div className='text-center text-imperial-300 py-8'>
               <p className='text-sm'>No messages yet.</p>
@@ -134,7 +134,6 @@ export function PersistentChat({ socket }: PersistentChatProps) {
               onKeyPress={handleKeyPress}
               placeholder='Type a message...'
               className='input-field flex-1'
-              maxLength={500}
               disabled={!socket}
             />
             <button
@@ -147,7 +146,7 @@ export function PersistentChat({ socket }: PersistentChatProps) {
           </div>
           <div className='flex justify-between items-center mt-2 text-xs text-imperial-400'>
             <span>Press Enter to send</span>
-            <span>{newMessage.length}/500</span>
+            <span>{newMessage.length} characters</span>
           </div>
         </div>
       </div>

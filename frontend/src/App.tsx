@@ -6,6 +6,7 @@ import { PersistentChat } from './components/PersistentChat';
 import { GameSyncPanel } from './components/GameSyncPanel';
 import { InstructionsDropdown } from './components/InstructionsDropdown';
 import { GameHosting } from './components/GameHosting';
+import { DesktopCapture } from './components/DesktopCapture';
 import { useWebSocket } from './hooks/useWebSocket';
 import { useGameDetection } from './hooks/useGameDetection';
 
@@ -156,20 +157,8 @@ function App() {
                     </div>
                     
                     {/* Desktop Area */}
-                    <div className='flex-1 flex items-center justify-center p-8'>
-                      <div className='text-center'>
-                        <div className='mb-6' style={{fontSize: '4rem'}}>🖥️</div>
-                        <h3 className='text-xl font-bold text-white mb-4'>Your Desktop</h3>
-                        <p className='text-gray-400 mb-6'>
-                          Use your desktop to launch Battlefront II through any platform
-                        </p>
-                        <div className='space-y-2 text-sm' style={{color: '#ced4da'}}>
-                          <p>• EA App (PC)</p>
-                          <p>• Steam (PC)</p>
-                          <p>• Epic Games (PC)</p>
-                          <p>• PS Remote Play (Console)</p>
-                        </div>
-                      </div>
+                    <div className='flex-1 flex items-center justify-center p-4'>
+                      <DesktopCapture />
                     </div>
                   </div>
                 </div>

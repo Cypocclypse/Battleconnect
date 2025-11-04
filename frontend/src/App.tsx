@@ -145,7 +145,7 @@ function App() {
               <div className='panel h-full flex flex-col'>
                 <div className='panel-header'>
                   <h2>
-                    {hasGameOwnership ? 'Battlefront II Coordination' : 'Waiting for Host Connection'}
+                    {hasGameOwnership ? 'Battlefront II Coordination' : 'Hosted Battlefront II Connection'}
                   </h2>
                 </div>
                 <div className='panel-content flex-1 overflow-hidden'>
@@ -165,17 +165,49 @@ function App() {
                       </div>
                     </div>
                   ) : (
-                    <div className='h-full w-full bg-black rounded flex items-center justify-center'>
-                      <div className='text-center'>
-                        <div className='mb-6' style={{fontSize: '4rem'}}>🎮</div>
-                        <h3 className='text-xl font-bold text-white mb-4'>Waiting for Game Host</h3>
-                        <p className='text-gray-400 mb-6'>
-                          You'll be connected to a host's Battlefront II game instance
+                    <div className='h-full w-full bg-black rounded flex flex-col'>
+                      {/* Hosted Game View Header */}
+                      <div className='p-4 border-b' style={{borderColor: '#495057'}}>
+                        <h3 className='text-lg font-bold text-white mb-2'>Hosted Battlefront II</h3>
+                        <p className='text-sm' style={{color: '#ced4da'}}>
+                          Playing via hosted connection - you'll see and control the host's game
                         </p>
-                        <div className='p-4 rounded border' style={{backgroundColor: '#212529', borderColor: '#495057'}}>
-                          <p className='text-sm' style={{color: '#ced4da'}}>
-                            💡 Request hosting from players who own the game in the lobby
-                          </p>
+                      </div>
+                      
+                      {/* Game Stream Area */}
+                      <div className='flex-1 flex items-center justify-center p-4'>
+                        <div className='w-full h-full flex items-center justify-center'>
+                          {inLobby ? (
+                            <div className='text-center'>
+                              <div className='mb-6' style={{fontSize: '4rem'}}>🎮</div>
+                              <h3 className='text-xl font-bold text-white mb-4'>Connected to Host's Game</h3>
+                              <p className='text-gray-400 mb-6'>
+                                Battlefront II will appear here when host starts their game
+                              </p>
+                              <div className='p-4 rounded border' style={{backgroundColor: '#212529', borderColor: '#495057'}}>
+                                <div className='flex items-center space-x-2 mb-2'>
+                                  <div className='w-2 h-2 rounded-full bg-green-500 animate-pulse' />
+                                  <span className='text-sm text-white'>Connected to host</span>
+                                </div>
+                                <p className='text-xs' style={{color: '#ced4da'}}>
+                                  🎯 You can control the host's game using your keyboard and mouse
+                                </p>
+                              </div>
+                            </div>
+                          ) : (
+                            <div className='text-center'>
+                              <div className='mb-6' style={{fontSize: '4rem'}}>🔍</div>
+                              <h3 className='text-xl font-bold text-white mb-4'>Find a Host</h3>
+                              <p className='text-gray-400 mb-6'>
+                                Join a lobby and request hosting from players who own Battlefront II
+                              </p>
+                              <div className='p-4 rounded border' style={{backgroundColor: '#212529', borderColor: '#495057'}}>
+                                <p className='text-sm' style={{color: '#ced4da'}}>
+                                  💡 Once connected, you'll play Battlefront II through the host's game
+                                </p>
+                              </div>
+                            </div>
+                          )}
                         </div>
                       </div>
                     </div>

@@ -46,24 +46,22 @@ function App() {
   }, [socket, connected, playerId, playerName, gameDetected, isGameRunning]);
 
   return (
-    <div className='w-full h-screen bg-imperial-900 text-white relative'>
-      {/* Background */}
-      <div className='absolute inset-0 bg-gradient-to-br from-imperial-900 via-imperial-800 to-black' />
-
+    <div className='w-full h-screen text-white' style={{backgroundColor: '#0d1117'}}>
       {/* Main Content */}
-      <div className='relative z-10 w-full h-full flex flex-col'>
+      <div className='w-full h-full flex flex-col'>
         {/* Header */}
-        <header className='flex items-center justify-between p-6 bg-imperial-800/80 backdrop-blur-sm border-b border-imperial-600'>
+        <header className='flex items-center justify-between p-6 border-b' style={{backgroundColor: 'rgba(33, 37, 41, 0.8)', borderColor: '#495057'}}>
           <div className='flex items-center space-x-4'>
-            <h1 className='text-3xl font-orbitron font-bold text-rebel-500'>BATTLECONNECT</h1>
+            <h1 className='text-3xl font-bold' style={{color: '#f97316'}}>BATTLECONNECT</h1>
             <div className={`w-3 h-3 rounded-full ${connected ? 'bg-green-500' : 'bg-red-500'}`} />
-            <span className='text-sm text-imperial-300'>
+            <span className='text-sm' style={{color: '#ced4da'}}>
               {connected ? 'Connected' : 'Disconnected'}
             </span>
           </div>
           <button
             onClick={() => setShowInstructions(!showInstructions)}
-            className='btn-secondary'
+            className='px-4 py-2 rounded text-white'
+            style={{backgroundColor: '#495057'}}
           >
             Instructions
           </button>

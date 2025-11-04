@@ -7,11 +7,48 @@
   body,
   #root {
     height: 100vh;
-    overflow: hidden;
   }
 
   * {
     box-sizing: border-box;
+  }
+
+  /* Custom Scrollbar Styles */
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: #f59e0b #1f2937; /* Yellow thumb, dark track */
+  }
+
+  /* Webkit browsers (Chrome, Safari, Edge) */
+  ::-webkit-scrollbar {
+    width: 12px;
+    height: 12px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: #1f2937; /* Dark gray track */
+    border-radius: 6px;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: linear-gradient(180deg, #f59e0b 0%, #d97706 100%); /* Yellow gradient */
+    border-radius: 6px;
+    border: 2px solid #1f2937;
+    transition: background 0.3s ease;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(180deg, #fbbf24 0%, #f59e0b 100%); /* Brighter yellow on hover */
+  }
+
+  ::-webkit-scrollbar-corner {
+    background: #1f2937;
+  }
+
+  /* Make sure panels can scroll */
+  .panel-content {
+    max-height: calc(100vh - 200px);
+    overflow-y: auto;
   }
 }
 

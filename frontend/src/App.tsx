@@ -46,7 +46,7 @@ function App() {
   }, [socket, connected, playerId, playerName, gameDetected, isGameRunning]);
 
   return (
-    <div className='w-full h-screen bg-imperial-900 text-white relative overflow-hidden'>
+    <div className='w-full h-screen bg-imperial-900 text-white relative'>
       {/* Background */}
       <div className='absolute inset-0 bg-gradient-to-br from-imperial-900 via-imperial-800 to-black' />
 
@@ -77,7 +77,7 @@ function App() {
         {/* Main Interface */}
         <div className='flex-1 flex'>
           {/* Left Panel - Game Detection & Lobby */}
-          <div className='w-1/3 p-6 space-y-6'>
+          <div className='w-1/3 p-6 space-y-6 overflow-y-auto h-full'>
             {!gameDetected ? (
               <GameDetection onGameConfirmed={() => setGameDetected(true)} />
             ) : (
@@ -103,7 +103,7 @@ function App() {
           </div>
 
           {/* Center - Main View */}
-          <div className='flex-1 p-6'>
+          <div className='flex-1 p-6 overflow-y-auto'>
             {gameDetected ? (
               <div className='panel h-full'>
                 <div className='panel-header'>
@@ -146,7 +146,7 @@ function App() {
           </div>
 
           {/* Right Panel - Chat & Voice */}
-          <div className='w-1/3 p-6 space-y-6'>
+          <div className='w-1/3 p-6 space-y-6 overflow-y-auto h-full'>
             {/* Voice Chat */}
             <VoiceChat socket={socket} />
 

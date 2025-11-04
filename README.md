@@ -2,6 +2,11 @@
 
 Battleconnect is a full-screen multiplayer shell for **Star Wars Battlefront II (2017)** that enables players on PC or via PS Remote Play to coordinate and play synchronized matches together — without mods, code injection, or game file modification.
 
+## 🚀 **Live Demo**
+**Try it now**: https://battleconnect-frontend.onrender.com
+
+[![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com/deploy?repo=https://github.com/Cypocclypse/Battleconnect)
+
 ## 🚀 Quick Start
 
 ### Prerequisites

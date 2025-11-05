@@ -133,10 +133,10 @@ export class LobbyManager {
     this.socketPlayerMap.set(socketId, playerId);
 
     console.log(`🌟 REVOLUTIONARY LOBBY CREATED: ${data.name} (${lobbyId}) by ${data.playerName}`);
-    console.log(`🚀 Auto-launching with settings:`, autoLaunchSettings);
+    console.log(`🚀 Auto-launch settings configured:`, autoLaunchSettings);
     
-    // REVOLUTIONARY: Immediately create distributed multiplayer session
-    this.createDistributedSession(lobby, playerId, autoLaunchSettings);
+    // REVOLUTIONARY: Distributed session will be created when match actually starts
+    // (not immediately when lobby is created - lobby should remain visible)
     
     return { success: true, lobby };
   }
@@ -384,6 +384,11 @@ export class LobbyManager {
 
     console.log(`🎯 MATCH STARTING: Coordinating ${lobby.players.length} players for ${lobby.name}`);
 
+    // REVOLUTIONARY: Create distributed session now that match is starting
+    if (lobby.autoLaunchSettings) {
+      this.createDistributedSession(lobby, playerId, lobby.autoLaunchSettings);
+    }
+
     // REVOLUTIONARY: Start match coordination protocol
     this.initiateMatchCoordination(lobby, playerId);
 
@@ -450,15 +455,21 @@ export class LobbyManager {
   }
 
   getPublicLobbies(): Lobby[] {
-    return Array.from(this.lobbies.values())
-      .filter(lobby => lobby.status === 'waiting')
-      .map(lobby => ({
-        ...lobby,
-        players: lobby.players.map(p => ({
-          ...p,
-          socketId: '', // Don't expose socket IDs
-        })),
-      }));
+    const allLobbies = Array.from(this.lobbies.values());
+    const waitingLobbies = allLobbies.filter(lobby => lobby.status === 'waiting');
+    
+    console.log(`🔍 Lobby Status Check: ${allLobbies.length} total, ${waitingLobbies.length} waiting`);
+    allLobbies.forEach(lobby => {
+      console.log(`  - ${lobby.name}: status=${lobby.status}, players=${lobby.players.length}`);
+    });
+    
+    return waitingLobbies.map(lobby => ({
+      ...lobby,
+      players: lobby.players.map(p => ({
+        ...p,
+        socketId: '', // Don't expose socket IDs
+      })),
+    }));
   }
 
   cleanupInactiveLobbies(): number {

@@ -24,29 +24,44 @@ export function LobbyManager({ socket, onJoinLobby, onLeaveLobby, hasGame, playe
   useEffect(() => {
     if (!socket) return;
 
+    console.log('🔌 LobbyManager: Setting up socket listeners');
+
     socket.on('lobby-list', (updatedLobbies: Lobby[]) => {
+      console.log('📋 Received lobby list update:', updatedLobbies.length, 'lobbies', updatedLobbies);
       setLobbies(updatedLobbies);
     });
     
     // Also listen for the old event name for compatibility
     socket.on('lobbies-updated', (updatedLobbies: Lobby[]) => {
+      console.log('📋 Received lobbies-updated:', updatedLobbies.length, 'lobbies');
       setLobbies(updatedLobbies);
     });
 
     socket.on('lobby-joined', (lobby: Lobby) => {
+      console.log('✅ Joined lobby:', lobby.name);
       setCurrentLobby(lobby);
       onJoinLobby();
     });
 
     socket.on('lobby-left', () => {
+      console.log('👋 Left lobby');
       setCurrentLobby(null);
       onLeaveLobby();
     });
 
     // Request initial lobby list  
+    console.log('📡 Requesting initial lobby list');
     socket.emit('get-lobbies');
 
+    // Also periodically refresh the lobby list
+    const refreshInterval = setInterval(() => {
+      console.log('🔄 Refreshing lobby list');
+      socket.emit('get-lobbies');
+    }, 5000); // Refresh every 5 seconds
+
     return () => {
+      console.log('🧹 LobbyManager: Cleaning up socket listeners');
+      clearInterval(refreshInterval);
       socket.off('lobby-list');
       socket.off('lobbies-updated');
       socket.off('lobby-joined');
@@ -55,7 +70,11 @@ export function LobbyManager({ socket, onJoinLobby, onLeaveLobby, hasGame, playe
   }, [socket, onJoinLobby, onLeaveLobby]);
 
   const handleCreateLobby = (gameSettings?: any) => {
-    if (!socket || !newLobbyName.trim()) return;
+    console.log('🎮 Attempting to create lobby:', newLobbyName.trim(), 'Socket:', !!socket);
+    if (!socket || !newLobbyName.trim()) {
+      console.log('❌ Cannot create lobby - Socket:', !!socket, 'Name:', newLobbyName.trim());
+      return;
+    }
 
     // Parse faction matchup
     const factionMap: Record<string, {lightSide: string, darkSide: string}> = {
@@ -66,12 +85,15 @@ export function LobbyManager({ socket, onJoinLobby, onLeaveLobby, hasGame, playe
 
     const selectedFactions = factionMap[factionMatchup];
 
-    socket.emit('create-lobby', {
+    const lobbyData = {
       name: newLobbyName.trim(),
       playerName: playerName,
       matchType: matchType,
       factionMatchup: selectedFactions,
-    });
+    };
+    
+    console.log('📡 Emitting create-lobby:', lobbyData);
+    socket.emit('create-lobby', lobbyData);
 
     setNewLobbyName('');
     setShowCreateForm(false);

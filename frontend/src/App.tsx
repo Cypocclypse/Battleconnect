@@ -27,9 +27,74 @@ function App() {
   const [playerId] = useState(
     localStorage.getItem('battleconnect-player-id') || `player_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
   );
+  const [detectedGamingProfile, setDetectedGamingProfile] = useState<any>(null);
 
   const { socket, connected } = useWebSocket();
   const { isGameRunning, manualConfirmation, confirmGame } = useGameDetection();
+
+  // Debug connection status
+  useEffect(() => {
+    console.log('🔌 WebSocket connection status:', { connected, socketExists: !!socket });
+  }, [connected, socket]);
+
+  // 🎮 AUTO-DETECT GAMING USERNAME
+  useEffect(() => {
+    if (window.electronAPI) {
+      // Electron: Get gaming profile if available
+      window.electronAPI.getGamingProfile().then((profile) => {
+        if (profile && profile.displayName && profile.displayName !== 'Anonymous Player') {
+          console.log('🎯 ELECTRON: Detected gaming username:', profile.displayName);
+          setDetectedGamingProfile(profile);
+          
+          // Auto-set player name if not manually set
+          const manualName = localStorage.getItem('battleconnect-player-name-manual');
+          if (!manualName) {
+            setPlayerName(profile.displayName);
+            localStorage.setItem('battleconnect-player-name', profile.displayName);
+          }
+        }
+      });
+      
+      // Listen for profile updates
+      window.electronAPI.onGamingProfilesDetected((data) => {
+        if (data.primary && data.primary.displayName !== 'Anonymous Player') {
+          console.log('🎯 GAMING PROFILES DETECTED:', data.primary.displayName);
+          setDetectedGamingProfile(data.primary);
+          
+          const manualName = localStorage.getItem('battleconnect-player-name-manual');
+          if (!manualName) {
+            setPlayerName(data.primary.displayName);
+            localStorage.setItem('battleconnect-player-name', data.primary.displayName);
+          }
+        }
+      });
+
+      window.electronAPI.onGamingProfileUpdated((profile) => {
+        setDetectedGamingProfile(profile);
+        setPlayerName(profile.displayName);
+        localStorage.setItem('battleconnect-player-name', profile.displayName);
+      });
+    } else if (socket) {
+      // Browser: Request gaming username from backend
+      console.log('🌐 BROWSER: Requesting gaming username from server...');
+      socket.emit('request-gaming-username');
+      
+      socket.on('gaming-username-detected', (data) => {
+        const { username, platform } = data;
+        if (username && username !== 'Unknown' && username !== 'Player') {
+          console.log(`🎯 BACKEND: Detected ${platform.toUpperCase()} username:`, username);
+          setDetectedGamingProfile({ displayName: username, platform });
+          
+          // Auto-set player name if not manually set
+          const manualName = localStorage.getItem('battleconnect-player-name-manual');
+          if (!manualName) {
+            setPlayerName(username);
+            localStorage.setItem('battleconnect-player-name', username);
+          }
+        }
+      });
+    }
+  }, [socket]);
 
   useEffect(() => {
     if (isGameRunning || manualConfirmation) {
@@ -94,7 +159,7 @@ function App() {
                 socket={socket} 
                 onJoinLobby={() => setInLobby(true)}
                 onLeaveLobby={() => setInLobby(false)}
-                hasGame={hasGameOwnership}
+                hasGame={hasGameOwnership || !window.electronAPI}
                 playerId={playerId}
                 playerName={playerName}
               />

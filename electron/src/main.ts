@@ -3,17 +3,20 @@ import * as path from 'path';
 import { GameDetector } from './GameDetector';
 import { DesktopCapture } from './DesktopCapture';
 import { BattleconnectGameLauncher } from './GameLauncher';
+import { GamingProfileDetector } from './GamingProfileDetector';
 
 class BattleconnectElectron {
   private mainWindow: BrowserWindow | null = null;
   private gameDetector: GameDetector;
   private desktopCapture: DesktopCapture;
   private gameLauncher: BattleconnectGameLauncher;
+  private profileDetector: GamingProfileDetector;
 
   constructor() {
     this.gameDetector = new GameDetector();
     this.desktopCapture = new DesktopCapture();
     this.gameLauncher = new BattleconnectGameLauncher();
+    this.profileDetector = new GamingProfileDetector();
     
     this.initializeApp();
   }
@@ -114,6 +117,20 @@ class BattleconnectElectron {
       return this.gameLauncher.getActiveSessions();
     });
 
+    // Gaming Profile Detection IPC
+    ipcMain.handle('get-gaming-profile', () => {
+      return this.profileDetector.getPrimaryProfile();
+    });
+
+    ipcMain.handle('get-all-gaming-profiles', () => {
+      return this.profileDetector.getAllProfiles();
+    });
+
+    ipcMain.handle('set-manual-profile', (_, { username, platform }) => {
+      this.profileDetector.setManualProfile(username, platform);
+      return this.profileDetector.getPrimaryProfile();
+    });
+
     // Desktop capture IPC
     ipcMain.handle('get-desktop-sources', async () => {
       return this.desktopCapture.getSources();
@@ -179,6 +196,15 @@ class BattleconnectElectron {
 
     this.gameLauncher.on('instanceCrashed', (data: any) => {
       this.mainWindow?.webContents.send('instance-crashed', data);
+    });
+
+    // Gaming profile events
+    this.profileDetector.on('profiles-detected', (data: any) => {
+      this.mainWindow?.webContents.send('gaming-profiles-detected', data);
+    });
+
+    this.profileDetector.on('profile-updated', (profile: any) => {
+      this.mainWindow?.webContents.send('gaming-profile-updated', profile);
     });
   }
 

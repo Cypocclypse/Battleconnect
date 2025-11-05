@@ -20,6 +20,17 @@ contextBridge.exposeInMainWorld('electronAPI', {
   getGameInstallations: () => ipcRenderer.invoke('get-game-installations'),
   getActiveSessions: () => ipcRenderer.invoke('get-active-sessions'),
   
+  // Gaming Profile Detection
+  getGamingProfile: () => ipcRenderer.invoke('get-gaming-profile'),
+  getAllGamingProfiles: () => ipcRenderer.invoke('get-all-gaming-profiles'),
+  setManualProfile: (username: string, platform?: string) => ipcRenderer.invoke('set-manual-profile', { username, platform }),
+  onGamingProfilesDetected: (callback: (data: any) => void) => {
+    ipcRenderer.on('gaming-profiles-detected', (_, data) => callback(data));
+  },
+  onGamingProfileUpdated: (callback: (profile: any) => void) => {
+    ipcRenderer.on('gaming-profile-updated', (_, profile) => callback(profile));
+  },
+  
   // Distributed game events
   onGameLaunched: (callback: (data: any) => void) => {
     ipcRenderer.on('game-launched', (_, data) => callback(data));

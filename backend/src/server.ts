@@ -11,6 +11,7 @@ import { VoiceService } from './services/VoiceService';
 import { SyncService } from './services/SyncService';
 import { GameHostingService } from './services/GameHostingService';
 import { BackendGameLauncher } from './services/BackendGameLauncher';
+import { BackendProfileDetector } from './services/BackendProfileDetector';
 import { sanitizeInput } from './utils/sanitization';
 import { ServerConfig } from './types';
 
@@ -75,14 +76,30 @@ const voiceService = new VoiceService();
 const syncService = new SyncService();
 const gameHostingService = new GameHostingService();
 const backendLauncher = new BackendGameLauncher();
+const profileDetector = new BackendProfileDetector();
+
+// Initialize gaming profile detection
+profileDetector.refreshProfile().then(profile => {
+  console.log(`🎮 BACKEND: Gaming profile detected - ${profile.username} (${profile.platform.toUpperCase()})`);
+});
 
 // Socket.IO connection handling
 io.on('connection', (socket) => {
   console.log(`User connected: ${socket.id}`);
 
+  // Send detected gaming username to browser users
+  socket.on('request-gaming-username', async () => {
+    const profile = profileDetector.getDetectedProfile() || await profileDetector.refreshProfile();
+    socket.emit('gaming-username-detected', {
+      username: profile.username,
+      platform: profile.platform
+    });
+  });
+
   // Lobby events
   socket.on('get-lobbies', () => {
     const lobbies = lobbyManager.getPublicLobbies();
+    console.log(`📋 Sending lobby list to ${socket.id}: ${lobbies.length} lobbies`);
     socket.emit('lobby-list', lobbies);
   });
 
@@ -102,7 +119,9 @@ io.on('connection', (socket) => {
         socket.emit('lobby-joined', result.lobby);
         
         // Notify all clients of updated lobby list
-        io.emit('lobby-list', lobbyManager.getPublicLobbies());
+        const publicLobbies = lobbyManager.getPublicLobbies();
+        console.log(`📋 Broadcasting lobby list to all clients: ${publicLobbies.length} lobbies`);
+        io.emit('lobby-list', publicLobbies);
         
         // Add system message
         const message = chatService.addSystemMessage(
@@ -530,15 +549,16 @@ io.on('connection', (socket) => {
     });
   });
 
-  socket.on('request-hosting', (data) => {
+  socket.on('request-distributed-hosting', (data) => {
     const { sessionId, reason } = data;
     
-    console.log('📣 Hosting request:', { sessionId, reason });
+    console.log('📣 Distributed hosting request:', { sessionId, reason });
     
     // Broadcast hosting request to all players in session
     socket.to(sessionId).emit('hosting-requested', {
       sessionId,
       requesterId: socket.id,
+      requesterSocketId: socket.id,
       reason
     });
   });

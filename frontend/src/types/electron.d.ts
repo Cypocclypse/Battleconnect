@@ -16,6 +16,13 @@ declare global {
       getGameInstallations: () => Promise<any[]>;
       getActiveSessions: () => Promise<any[]>;
       
+      // Gaming Profile Detection
+      getGamingProfile: () => Promise<any>;
+      getAllGamingProfiles: () => Promise<any[]>;
+      setManualProfile: (username: string, platform?: string) => Promise<any>;
+      onGamingProfilesDetected: (callback: (data: any) => void) => void;
+      onGamingProfileUpdated: (callback: (profile: any) => void) => void;
+      
       // Distributed game events
       onGameLaunched: (callback: (data: any) => void) => void;
       onInstanceRegistered: (callback: (data: any) => void) => void;

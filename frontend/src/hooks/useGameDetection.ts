@@ -64,13 +64,4 @@ export function useGameDetection() {
   };
 }
 
-// Extend Window interface for Electron API
-declare global {
-  interface Window {
-    electronAPI?: {
-      onGameDetected: (callback: (detected: boolean, platform: string) => void) => void;
-      startGameMonitoring: () => void;
-      stopGameMonitoring: () => void;
-    };
-  }
-}
+// Types imported from main electron.d.ts file

@@ -1,33 +1,20 @@
-/// <reference types="vite/client" />
-
-interface ImportMetaEnv {
-  readonly VITE_API_URL: string;
-  readonly VITE_WS_URL: string;
-}
-
-interface ImportMeta {
-  readonly env: ImportMetaEnv;
-}
-
+// Extend the Window interface for Electron APIs
 declare global {
   interface Window {
-    electronAPI?: {
+    electronAPI: {
       // Game detection
-      startGameMonitoring: () => Promise<boolean>;
-      stopGameMonitoring: () => Promise<boolean>;
+      startGameMonitoring: () => Promise<void>;
+      stopGameMonitoring: () => Promise<void>;
       getGameStatus: () => Promise<any>;
       onGameDetected: (callback: (detected: boolean, platform: string) => void) => void;
       onGameStatusChanged: (callback: (status: any) => void) => void;
 
       // REVOLUTIONARY: Distributed Game Launcher
-      launchDistributedGame: (data: {
-        sessionId: string;
-        gameSettings: any;
-        autoDetect: boolean;
-        fallbackToHosting: boolean;
-      }) => Promise<'launched' | 'requesting_host'>;
-      forceReconnection: (data: { sessionId: string; instanceId: string }) => Promise<{ success: boolean }>;
+      launchDistributedGame: (data: any) => Promise<any>;
+      autoLaunchGame: (sessionId: string, lobbySettings?: any) => Promise<any>;
+      stopGame: (sessionId: string) => Promise<any>;
       getGameInstallations: () => Promise<any[]>;
+      getActiveSessions: () => Promise<any[]>;
       
       // Distributed game events
       onGameLaunched: (callback: (data: any) => void) => void;
@@ -38,22 +25,24 @@ declare global {
       onRequestHosting: (callback: (data: any) => void) => void;
       onGameReady: (callback: (data: any) => void) => void;
       onPlayerJoined: (callback: (data: any) => void) => void;
-      
+
       // Desktop capture
       getDesktopSources: () => Promise<any[]>;
-      startDesktopCapture: (sourceId: string) => Promise<boolean>;
-      stopDesktopCapture: () => Promise<boolean>;
-      
+      startDesktopCapture: (sourceId: string) => Promise<void>;
+      stopDesktopCapture: () => Promise<void>;
+
       // System integration
-      launchGamePlatform: (platform: string) => Promise<boolean>;
+      launchGamePlatform: (platform: string) => Promise<void>;
       getSystemInfo: () => Promise<any>;
-      
-      // Input forwarding for game sharing
+
+      // Input forwarding
       sendKeyboardInput: (keyEvent: any) => void;
       sendMouseInput: (mouseEvent: any) => void;
-      
+
       // Utility
       removeAllListeners: (channel: string) => void;
     };
   }
 }
+
+export {};

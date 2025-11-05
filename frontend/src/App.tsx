@@ -6,6 +6,7 @@ import { PersistentChat } from './components/PersistentChat';
 import { GameSyncPanel } from './components/GameSyncPanel';
 import { InstructionsDropdown } from './components/InstructionsDropdown';
 import { GameHosting } from './components/GameHosting';
+import { DistributedGamePanel } from './components/DistributedGamePanel';
 import { useWebSocket } from './hooks/useWebSocket';
 import { useGameDetection } from './hooks/useGameDetection';
 
@@ -14,6 +15,12 @@ function App() {
   const [inLobby, setInLobby] = useState(false);
   const [showInstructions, setShowInstructions] = useState(false);
   const [hasGameOwnership, setHasGameOwnership] = useState(false);
+  const [currentLobbyId, setCurrentLobbyId] = useState<string | null>(null);
+  const [lobbySettings, setLobbySettings] = useState({
+    map: 'Geonosis',
+    mode: 'Supremacy', 
+    factions: { light: 'Republic', dark: 'Separatists' }
+  });
   const [playerName, setPlayerName] = useState(
     localStorage.getItem('battleconnect-player-name') || `Player_${Math.random().toString(36).substr(2, 6)}`
   );
@@ -138,9 +145,14 @@ function App() {
             {inLobby && <GameSyncPanel socket={socket} />}
           </div>
 
-          {/* Center - Main View */}
+          {/* Center - Revolutionary Distributed Game Panel */}
           <div className='flex-1 p-4 overflow-y-auto min-h-0'>
-            {gameDetected ? (
+            {gameDetected && inLobby ? (
+              <DistributedGamePanel 
+                lobbyId={currentLobbyId || 'default'} 
+                gameSettings={lobbySettings}
+              />
+            ) : gameDetected ? (
               <div className='panel h-full flex flex-col'>
                 <div className='panel-header'>
                   <h2>
@@ -148,87 +160,27 @@ function App() {
                   </h2>
                 </div>
                 <div className='panel-content flex-1 overflow-hidden'>
-                  {hasGameOwnership ? (
-                    <div className='h-full w-full flex flex-col'>
-                      {/* Match Coordination Header */}
-                      <div className='p-4 border-b' style={{borderColor: '#495057'}}>
-                        <h3 className='text-lg font-bold text-white mb-2'>Battlefront II Match Coordination</h3>
-                        <p className='text-sm' style={{color: '#ced4da'}}>
-                          Join coordinated multiplayer matches with other players
-                        </p>
-                      </div>
-                      
-                      {/* Match Info Area */}
-                      <div className='flex-1 p-6 flex items-center justify-center'>
-                        {inLobby ? (
-                          <div className='text-center max-w-md'>
-                            <div className='mb-6' style={{fontSize: '4rem'}}>⚔️</div>
-                            <h3 className='text-2xl font-bold text-white mb-4'>Ready for Coordinated Match</h3>
-                            <p className='text-gray-400 mb-6'>
-                              Launch Battlefront II and join the same multiplayer lobby as your teammates
-                            </p>
-                            <div className='space-y-3 text-sm' style={{color: '#ced4da'}}>
-                              <div className='p-3 rounded' style={{backgroundColor: '#212529'}}>
-                                <p className='font-semibold mb-2'>🎯 Match Instructions:</p>
-                                <p>1. Launch Battlefront II</p>
-                                <p>2. Go to Multiplayer</p>
-                                <p>3. Join the same game mode/map</p>
-                                <p>4. Coordinate via voice chat</p>
-                              </div>
-                            </div>
-                          </div>
-                        ) : (
-                          <div className='text-center'>
-                            <div className='mb-6' style={{fontSize: '4rem'}}>🎮</div>
-                            <h3 className='text-2xl font-bold text-white mb-4'>Join a Lobby</h3>
-                            <p className='text-gray-400 mb-6'>
-                              Create or join a lobby to coordinate Battlefront II matches with other players
-                            </p>
-                          </div>
-                        )}
+                  <div className='h-full w-full flex items-center justify-center'>
+                    <div className='text-center'>
+                      <div className='mb-6' style={{fontSize: '4rem'}}>🎮</div>
+                      <h3 className='text-2xl font-bold text-white mb-4'>Join a Lobby</h3>
+                      <p className='text-gray-400 mb-6'>
+                        Create or join a lobby to access the revolutionary distributed game system
+                      </p>
+                      <div className='bg-gradient-to-r from-blue-900/50 to-purple-900/50 border border-blue-700 rounded-lg p-4 max-w-md mx-auto'>
+                        <h4 className='text-white font-semibold mb-2 flex items-center gap-2'>
+                          <span>⚡</span>
+                          Revolutionary Features Awaiting
+                        </h4>
+                        <ul className='text-sm text-gray-300 space-y-1 text-left'>
+                          <li>• Auto-detection of Battlefront II installations</li>
+                          <li>• Automatic game launching with multiplayer override</li>
+                          <li>• Distributed network that survives host crashes</li>
+                          <li>• Seamless reconnection with state sync</li>
+                        </ul>
                       </div>
                     </div>
-                  ) : (
-                    <div className='h-full w-full flex flex-col'>
-                      {/* Hosted Match Header */}
-                      <div className='p-4 border-b' style={{borderColor: '#495057'}}>
-                        <h3 className='text-lg font-bold text-white mb-2'>Hosted Match Participation</h3>
-                        <p className='text-sm' style={{color: '#ced4da'}}>
-                          Join Battlefront II matches through game owners who can host you
-                        </p>
-                      </div>
-                      
-                      {/* Hosting Info Area */}
-                      <div className='flex-1 p-6 flex items-center justify-center'>
-                        {inLobby ? (
-                          <div className='text-center max-w-md'>
-                            <div className='mb-6' style={{fontSize: '4rem'}}>🤝</div>
-                            <h3 className='text-2xl font-bold text-white mb-4'>Request Game Hosting</h3>
-                            <p className='text-gray-400 mb-6'>
-                              Ask lobby members who own Battlefront II to host you in their matches
-                            </p>
-                            <div className='space-y-3 text-sm' style={{color: '#ced4da'}}>
-                              <div className='p-3 rounded' style={{backgroundColor: '#212529'}}>
-                                <p className='font-semibold mb-2'>🎯 How It Works:</p>
-                                <p>1. Request hosting from game owners</p>
-                                <p>2. They invite you to their match</p>
-                                <p>3. Join the same multiplayer lobby</p>
-                                <p>4. Play together in coordinated teams</p>
-                              </div>
-                            </div>
-                          </div>
-                        ) : (
-                          <div className='text-center'>
-                            <div className='mb-6' style={{fontSize: '4rem'}}>🔍</div>
-                            <h3 className='text-2xl font-bold text-white mb-4'>Find Game Owners</h3>
-                            <p className='text-gray-400 mb-6'>
-                              Join a lobby to find players who own Battlefront II and can host matches
-                            </p>
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                  )}
+                  </div>
                 </div>
               </div>
             ) : (

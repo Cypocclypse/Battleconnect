@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { io, Socket } from 'socket.io-client';
 
 export function useWebSocket(url?: string) {
@@ -35,8 +35,17 @@ export function useWebSocket(url?: string) {
     };
   }, [url]);
 
+  const sendMessage = useCallback((event: string, data?: any) => {
+    if (socketRef.current && connected) {
+      socketRef.current.emit(event, data);
+    } else {
+      console.warn('Socket not connected, cannot send message:', event);
+    }
+  }, [connected]);
+
   return {
     socket: socketRef.current,
     connected,
+    sendMessage,
   };
 }

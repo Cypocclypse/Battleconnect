@@ -2,15 +2,18 @@ import { app, BrowserWindow, ipcMain, desktopCapturer, shell } from 'electron';
 import * as path from 'path';
 import { GameDetector } from './GameDetector';
 import { DesktopCapture } from './DesktopCapture';
+import { BattleconnectGameLauncher } from './GameLauncher';
 
 class BattleconnectElectron {
   private mainWindow: BrowserWindow | null = null;
   private gameDetector: GameDetector;
   private desktopCapture: DesktopCapture;
+  private gameLauncher: BattleconnectGameLauncher;
 
   constructor() {
     this.gameDetector = new GameDetector();
     this.desktopCapture = new DesktopCapture();
+    this.gameLauncher = new BattleconnectGameLauncher();
     
     this.initializeApp();
   }
@@ -88,6 +91,29 @@ class BattleconnectElectron {
       return this.gameDetector.getCurrentStatus();
     });
 
+    // REVOLUTIONARY: Distributed Game Launch IPC
+    ipcMain.handle('launch-distributed-game', async (_, data) => {
+      console.log('🚀 ELECTRON: Launching distributed game:', data);
+      return this.gameLauncher.autoLaunchGame(data.sessionId, data.gameSettings);
+    });
+
+    ipcMain.handle('auto-launch-game', async (_, { sessionId, lobbySettings }) => {
+      console.log('🎯 ELECTRON: Auto-launching game for session:', sessionId);
+      return this.gameLauncher.autoLaunchGame(sessionId, lobbySettings);
+    });
+
+    ipcMain.handle('stop-game', async (_, sessionId) => {
+      return this.gameLauncher.stopGame(sessionId);
+    });
+
+    ipcMain.handle('get-game-installations', () => {
+      return this.gameDetector.getInstallations();
+    });
+
+    ipcMain.handle('get-active-sessions', () => {
+      return this.gameLauncher.getActiveSessions();
+    });
+
     // Desktop capture IPC
     ipcMain.handle('get-desktop-sources', async () => {
       return this.desktopCapture.getSources();
@@ -132,6 +158,27 @@ class BattleconnectElectron {
 
     this.gameDetector.on('gameStatusChanged', (status: any) => {
       this.mainWindow?.webContents.send('game-status-changed', status);
+    });
+
+    // Revolutionary game launcher events
+    this.gameLauncher.on('gameLaunched', (data: any) => {
+      this.mainWindow?.webContents.send('game-launched', data);
+    });
+
+    this.gameLauncher.on('instanceRegistered', (data: any) => {
+      this.mainWindow?.webContents.send('instance-registered', data);
+    });
+
+    this.gameLauncher.on('hostPromoted', (data: any) => {
+      this.mainWindow?.webContents.send('host-promoted', data);
+    });
+
+    this.gameLauncher.on('reconnectionSuccess', (data: any) => {
+      this.mainWindow?.webContents.send('reconnection-success', data);
+    });
+
+    this.gameLauncher.on('instanceCrashed', (data: any) => {
+      this.mainWindow?.webContents.send('instance-crashed', data);
     });
   }
 

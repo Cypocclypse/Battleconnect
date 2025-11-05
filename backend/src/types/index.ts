@@ -18,6 +18,35 @@ export interface Lobby {
   factionMatchup: FactionMatchup;
   status: 'waiting' | 'starting' | 'in-progress' | 'ended';
   createdAt: number;
+  // Revolutionary distributed multiplayer
+  gameSession?: GameSession;
+  autoLaunchSettings?: AutoLaunchSettings;
+}
+
+export interface GameSession {
+  id: string;
+  hostGameProcess?: number; // PID of host's Battlefront II
+  worldOverride: WorldOverrideSettings;
+  connectedPlayers: string[]; // Player IDs connected to the session
+  status: 'launching' | 'active' | 'transferring-host' | 'crashed';
+  startTime: number;
+}
+
+export interface AutoLaunchSettings {
+  map: BattlefrontMap;
+  gameMode: GameMode;
+  era: Era;
+  playerCount: number;
+  enableBots: boolean;
+  difficulty: 'easy' | 'normal' | 'hard';
+}
+
+export interface WorldOverrideSettings {
+  originalMode: 'singleplayer' | 'arcade' | 'instant-action';
+  overrideToMultiplayer: boolean;
+  hostPlayerId: string;
+  allowJoinInProgress: boolean;
+  maxPlayers: number;
 }
 
 export type MatchType = 
@@ -40,6 +69,30 @@ export type Faction =
   | 'separatists'
   | 'empire'
   | 'first-order';
+
+// Real Battlefront II content
+export type Era = 'clone-wars' | 'galactic-civil-war' | 'sequel-era';
+
+export type GameMode = 
+  | 'galactic-assault'
+  | 'capital-supremacy' 
+  | 'heroes-vs-villains'
+  | 'hero-showdown'
+  | 'blast'
+  | 'strike'
+  | 'extraction'
+  | 'jetpack-cargo'
+  | 'ewok-hunt'
+  | 'co-op'
+  | 'instant-action';
+
+export type BattlefrontMap = 
+  // Clone Wars Era
+  | 'kamino' | 'naboo' | 'kashyyyk' | 'geonosis' | 'felucia'
+  // Galactic Civil War Era  
+  | 'tatooine' | 'hoth' | 'endor' | 'yavin-4' | 'death-star-ii'
+  // Sequel Era
+  | 'jakku' | 'takodana' | 'starkiller-base' | 'crait' | 'ajan-kloss';
 
 export interface ChatMessage {
   id: string;

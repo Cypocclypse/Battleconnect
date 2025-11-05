@@ -13,6 +13,39 @@ contextBridge.exposeInMainWorld('electronAPI', {
     ipcRenderer.on('game-status-changed', (_, status) => callback(status));
   },
 
+  // REAL: Auto Game Launcher
+  launchDistributedGame: (data: any) => ipcRenderer.invoke('launch-distributed-game', data),
+  autoLaunchGame: (sessionId: string, lobbySettings?: any) => ipcRenderer.invoke('auto-launch-game', { sessionId, lobbySettings }),
+  stopGame: (sessionId: string) => ipcRenderer.invoke('stop-game', sessionId),
+  getGameInstallations: () => ipcRenderer.invoke('get-game-installations'),
+  getActiveSessions: () => ipcRenderer.invoke('get-active-sessions'),
+  
+  // Distributed game events
+  onGameLaunched: (callback: (data: any) => void) => {
+    ipcRenderer.on('game-launched', (_, data) => callback(data));
+  },
+  onInstanceRegistered: (callback: (data: any) => void) => {
+    ipcRenderer.on('instance-registered', (_, data) => callback(data));
+  },
+  onHostPromoted: (callback: (data: any) => void) => {
+    ipcRenderer.on('host-promoted', (_, data) => callback(data));
+  },
+  onReconnectionSuccess: (callback: (data: any) => void) => {
+    ipcRenderer.on('reconnection-success', (_, data) => callback(data));
+  },
+  onInstanceCrashed: (callback: (data: any) => void) => {
+    ipcRenderer.on('instance-crashed', (_, data) => callback(data));
+  },
+  onRequestHosting: (callback: (data: any) => void) => {
+    ipcRenderer.on('request-hosting', (_, data) => callback(data));
+  },
+  onGameReady: (callback: (data: any) => void) => {
+    ipcRenderer.on('game-ready', (_, data) => callback(data));
+  },
+  onPlayerJoined: (callback: (data: any) => void) => {
+    ipcRenderer.on('player-joined', (_, data) => callback(data));
+  },
+
   // Desktop capture
   getDesktopSources: () => ipcRenderer.invoke('get-desktop-sources'),
   startDesktopCapture: (sourceId: string) => ipcRenderer.invoke('start-desktop-capture', sourceId),

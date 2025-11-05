@@ -1,13 +1,56 @@
 import { v4 as uuidv4 } from 'uuid';
-import { Lobby, Player, MatchType, FactionMatchup, ServerConfig } from '../types';
+import { Lobby, Player, MatchType, FactionMatchup, ServerConfig, AutoLaunchSettings, BattlefrontMap, GameMode, Era } from '../types';
 import { validateUsername, validateLobbyName } from '../utils/sanitization';
+import { DistributedGameManager } from './DistributedGameManager';
+import { MatchCoordinationProtocol } from './MatchCoordinationProtocol';
 
 export class LobbyManager {
   private lobbies = new Map<string, Lobby>();
   private playerLobbyMap = new Map<string, string>(); // playerId -> lobbyId
   private socketPlayerMap = new Map<string, string>(); // socketId -> playerId
+  private distributedGameManager: DistributedGameManager;
+  private matchCoordinationProtocol: MatchCoordinationProtocol;
 
-  constructor(private config: ServerConfig) {}
+  constructor(private config: ServerConfig) {
+    this.distributedGameManager = new DistributedGameManager();
+    this.matchCoordinationProtocol = new MatchCoordinationProtocol();
+    this.setupDistributedGameEvents();
+    this.setupMatchCoordinationEvents();
+  }
+
+  private setupDistributedGameEvents(): void {
+    // Forward distributed game events to socket handlers
+    this.distributedGameManager.on('auto-launch-game', (data) => {
+      console.log('🚀 REVOLUTIONARY: Auto-launching game for lobby', data.lobbyId);
+    });
+
+    this.distributedGameManager.on('session-ready', (data) => {
+      console.log('✅ REVOLUTIONARY: Session ready for lobby', data.lobbyId);
+    });
+
+    this.distributedGameManager.on('transfer-host', (data) => {
+      console.log('🔄 REVOLUTIONARY: Host transferred in lobby', data.lobbyId);
+    });
+  }
+
+  private setupMatchCoordinationEvents(): void {
+    // Handle match coordination events
+    this.matchCoordinationProtocol.on('match-coordinated', (data) => {
+      console.log('🎯 MATCH COORDINATED: Players synchronized for', data.lobbyId);
+    });
+
+    this.matchCoordinationProtocol.on('coordinate-arcade', (data) => {
+      console.log('🎮 ARCADE COORDINATION: Setting up Instant Action for', data.matchId);
+    });
+
+    this.matchCoordinationProtocol.on('coordinate-server-browser', (data) => {
+      console.log('🎯 SERVER BROWSER: Setting up private match', data.serverName);
+    });
+
+    this.matchCoordinationProtocol.on('coordinate-match-code', (data) => {
+      console.log('🚀 MATCH CODE: Synchronizing with code', data.matchCode);
+    });
+  }
 
   createLobby(
     socketId: string,
@@ -16,6 +59,15 @@ export class LobbyManager {
       playerName: string;
       matchType: MatchType;
       factionMatchup: FactionMatchup;
+      // REVOLUTIONARY: Auto-launch settings
+      autoLaunch?: {
+        map: BattlefrontMap;
+        gameMode: GameMode;
+        era: Era;
+        playerCount: number;
+        enableBots: boolean;
+        difficulty: 'easy' | 'normal' | 'hard';
+      };
     }
   ): { success: boolean; lobby?: Lobby; message?: string } {
     // Validate input
@@ -51,6 +103,16 @@ export class LobbyManager {
       joinedAt: Date.now(),
     };
 
+    // REVOLUTIONARY: Default auto-launch settings if not provided
+    const autoLaunchSettings: AutoLaunchSettings = data.autoLaunch || {
+      map: 'naboo', // Default to iconic Naboo
+      gameMode: 'galactic-assault',
+      era: 'clone-wars',
+      playerCount: 20,
+      enableBots: true,
+      difficulty: 'normal'
+    };
+
     const lobby: Lobby = {
       id: lobbyId,
       name: data.name,
@@ -61,6 +123,8 @@ export class LobbyManager {
       factionMatchup: data.factionMatchup,
       status: 'waiting',
       createdAt: Date.now(),
+      // REVOLUTIONARY: Add distributed multiplayer settings
+      autoLaunchSettings,
     };
 
     // Store mappings
@@ -68,9 +132,44 @@ export class LobbyManager {
     this.playerLobbyMap.set(playerId, lobbyId);
     this.socketPlayerMap.set(socketId, playerId);
 
-    console.log(`Lobby created: ${data.name} (${lobbyId}) by ${data.playerName}`);
+    console.log(`🌟 REVOLUTIONARY LOBBY CREATED: ${data.name} (${lobbyId}) by ${data.playerName}`);
+    console.log(`🚀 Auto-launching with settings:`, autoLaunchSettings);
+    
+    // REVOLUTIONARY: Immediately create distributed multiplayer session
+    this.createDistributedSession(lobby, playerId, autoLaunchSettings);
     
     return { success: true, lobby };
+  }
+
+  /**
+   * REVOLUTIONARY: Create distributed multiplayer session when lobby is created
+   */
+  private async createDistributedSession(
+    lobby: Lobby, 
+    hostPlayerId: string, 
+    launchSettings: AutoLaunchSettings
+  ): Promise<void> {
+    try {
+      const result = await this.distributedGameManager.createDistributedSession(
+        lobby, 
+        hostPlayerId, 
+        launchSettings
+      );
+      
+      if (result.success && result.session) {
+        // Update lobby with session info
+        const lobbyToUpdate = this.lobbies.get(lobby.id);
+        if (lobbyToUpdate) {
+          lobbyToUpdate.gameSession = result.session;
+          lobbyToUpdate.status = 'starting';
+          console.log(`✅ REVOLUTIONARY: Distributed session created for ${lobby.name}`);
+        }
+      } else {
+        console.error(`❌ Failed to create distributed session: ${result.error}`);
+      }
+    } catch (error) {
+      console.error('❌ Error creating distributed session:', error);
+    }
   }
 
   joinLobby(
@@ -126,9 +225,39 @@ export class LobbyManager {
     this.playerLobbyMap.set(playerId, lobbyId);
     this.socketPlayerMap.set(socketId, playerId);
 
-    console.log(`Player ${playerName} joined lobby ${lobby.name}`);
+    console.log(`🌟 REVOLUTIONARY: Player ${playerName} joined lobby ${lobby.name}`);
+    
+    // REVOLUTIONARY: Connect player to distributed session
+    this.connectPlayerToDistributedSession(lobby, playerId);
     
     return { success: true, lobby };
+  }
+
+  /**
+   * REVOLUTIONARY: Connect player to existing distributed session
+   */
+  private async connectPlayerToDistributedSession(
+    lobby: Lobby,
+    playerId: string
+  ): Promise<void> {
+    if (lobby.gameSession) {
+      try {
+        console.log(`🔗 REVOLUTIONARY: Connecting player ${playerId} to session ${lobby.gameSession.id}`);
+        
+        const result = await this.distributedGameManager.connectPlayerToSession(
+          lobby.id,
+          playerId
+        );
+        
+        if (result.success) {
+          console.log(`✅ REVOLUTIONARY: Player ${playerId} connected to distributed session`);
+        } else {
+          console.error(`❌ Failed to connect player to session: ${result.error}`);
+        }
+      } catch (error) {
+        console.error('❌ Error connecting player to distributed session:', error);
+      }
+    }
   }
 
   leaveLobby(socketId: string): {
@@ -253,9 +382,51 @@ export class LobbyManager {
     // Final team assignment
     this.assignTeams(lobby);
 
-    console.log(`Match starting in lobby ${lobby.name}`);
+    console.log(`🎯 MATCH STARTING: Coordinating ${lobby.players.length} players for ${lobby.name}`);
+
+    // REVOLUTIONARY: Start match coordination protocol
+    this.initiateMatchCoordination(lobby, playerId);
 
     return { success: true, lobby };
+  }
+
+  /**
+   * REVOLUTIONARY: Initiate match coordination protocol
+   */
+  private async initiateMatchCoordination(
+    lobby: Lobby,
+    hostPlayerId: string
+  ): Promise<void> {
+    try {
+      if (lobby.gameSession) {
+        console.log(`🎯 INITIATING MATCH COORDINATION for ${lobby.name}`);
+        
+        const result = await this.matchCoordinationProtocol.coordinateMatch(
+          lobby.id,
+          hostPlayerId,
+          lobby.players,
+          lobby.gameSession
+        );
+        
+        if (result.success && result.match) {
+          console.log('✅ MATCH COORDINATION: Successfully coordinated players!');
+          console.log('📋 Join Instructions:');
+          result.instructions?.forEach(instruction => {
+            console.log(`   ${instruction}`);
+          });
+          
+          // Update lobby status to in-progress
+          lobby.status = 'in-progress';
+          
+        } else {
+          console.error(`❌ Match coordination failed: ${result.error}`);
+          lobby.status = 'waiting'; // Revert status
+        }
+      }
+    } catch (error) {
+      console.error('❌ Error initiating match coordination:', error);
+      lobby.status = 'waiting'; // Revert status
+    }
   }
 
   findPlayerBySocketId(socketId: string): Player | undefined {

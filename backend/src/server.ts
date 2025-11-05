@@ -10,6 +10,7 @@ import { ChatService } from './services/ChatService';
 import { VoiceService } from './services/VoiceService';
 import { SyncService } from './services/SyncService';
 import { GameHostingService } from './services/GameHostingService';
+import { BackendGameLauncher } from './services/BackendGameLauncher';
 import { sanitizeInput } from './utils/sanitization';
 import { ServerConfig } from './types';
 
@@ -73,6 +74,7 @@ const chatService = new ChatService(config);
 const voiceService = new VoiceService();
 const syncService = new SyncService();
 const gameHostingService = new GameHostingService();
+const backendLauncher = new BackendGameLauncher();
 
 // Socket.IO connection handling
 io.on('connection', (socket) => {
@@ -409,6 +411,136 @@ io.on('connection', (socket) => {
   socket.on('end-game-sharing', (data) => {
     const { sessionId } = data;
     socket.broadcast.emit('session-ended', { sessionId });
+  });
+
+  // REVOLUTIONARY: Distributed Game Events
+  socket.on('launch-distributed-game', async (data) => {
+    const { sessionId, gameSettings, autoDetect, fallbackToHosting } = data;
+    
+    console.log('🚀 BATTLECONNECT: Launch request received:', sessionId);
+    
+    // Try backend launcher for browser users
+    if (backendLauncher.canLaunchGames()) {
+      console.log('🌐 BROWSER: Using backend game launcher');
+      
+      const result = await backendLauncher.launchGameForBrowser(sessionId);
+      
+      if (result.success) {
+        // Notify all clients that game launched successfully
+        io.to(sessionId).emit('game-launched', {
+          sessionId,
+          platform: result.platform,
+          processId: result.processId,
+          isHost: true,
+          isLocalInstance: false // Backend launch
+        });
+      } else {
+        socket.emit('launch-failed', {
+          sessionId,
+          error: result.error
+        });
+      }
+    } else {
+      // Fallback to Electron launcher notification
+      socket.emit('start-auto-launch', {
+        sessionId,
+        gameSettings,
+        autoDetect,
+        fallbackToHosting
+      });
+    }
+    
+    // Broadcast to other players that launch is in progress
+    socket.to(sessionId).emit('launch-in-progress', {
+      sessionId,
+      initiatorId: socket.id
+    });
+  });
+
+  socket.on('game-launched', (data) => {
+    const { sessionId, instanceId, isHost, isLocalInstance } = data;
+    
+    console.log('✅ Game launched:', { sessionId, instanceId, isHost });
+    
+    // Broadcast to all players in the session
+    io.to(sessionId).emit('game-launched', {
+      sessionId,
+      instanceId,
+      isHost,
+      isLocalInstance: socket.id === data.socketId
+    });
+  });
+
+  socket.on('instance-registered', (data) => {
+    const { sessionId, instanceId, isHost, totalInstances } = data;
+    
+    console.log('📡 Instance registered:', { instanceId, isHost, totalInstances });
+    
+    // Update network status for all players
+    io.to(sessionId).emit('network-status-updated', {
+      totalInstances,
+      activeInstances: totalInstances, // Initially all are active
+      isDistributed: totalInstances > 1,
+      sessionHealth: 'healthy'
+    });
+  });
+
+  socket.on('host-promoted', (data) => {
+    const { sessionId, newHostId } = data;
+    
+    console.log('👑 Host promoted:', { sessionId, newHostId });
+    
+    io.to(sessionId).emit('host-promoted', {
+      sessionId,
+      newHostId
+    });
+  });
+
+  socket.on('instance-crashed', (data) => {
+    const { sessionId, instanceId } = data;
+    
+    console.log('💥 Instance crashed:', { sessionId, instanceId });
+    
+    io.to(sessionId).emit('instance-crashed', {
+      sessionId,
+      instanceId
+    });
+  });
+
+  socket.on('force-reconnection', (data) => {
+    const { sessionId, instanceId } = data;
+    
+    console.log('🔄 Force reconnection:', { sessionId, instanceId });
+    
+    // Trigger reconnection attempt
+    socket.emit('attempt-reconnection', {
+      sessionId,
+      instanceId
+    });
+  });
+
+  socket.on('reconnection-success', (data) => {
+    const { sessionId, instanceId } = data;
+    
+    console.log('✅ Reconnection successful:', { sessionId, instanceId });
+    
+    io.to(sessionId).emit('reconnection-success', {
+      sessionId,
+      instanceId
+    });
+  });
+
+  socket.on('request-hosting', (data) => {
+    const { sessionId, reason } = data;
+    
+    console.log('📣 Hosting request:', { sessionId, reason });
+    
+    // Broadcast hosting request to all players in session
+    socket.to(sessionId).emit('hosting-requested', {
+      sessionId,
+      requesterId: socket.id,
+      reason
+    });
   });
 
   // Disconnect handling
